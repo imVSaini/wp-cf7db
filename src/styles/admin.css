@@ -1,0 +1,650 @@
+/* Contact Form 7 Database Admin Styles */
+
+/* Layout */
+.cf7db-layout {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.cf7db-header {
+  background: #f5f5f5 !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #e8e8e8;
+  height: 64px !important;
+  line-height: 64px !important;
+}
+
+.cf7db-content {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.cf7db-main-panel {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  padding: 16px;
+  min-height: 400px;
+}
+
+/* Header Elements */
+.cf7db-header h1 {
+  color: #262626 !important;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cf7db-header .ant-typography {
+  color: #262626 !important;
+  font-weight: 600;
+}
+
+.cf7db-header .ant-select {
+  min-width: 180px;
+}
+
+.cf7db-header .ant-input {
+  border-radius: 6px;
+  height: 40px;
+}
+
+.cf7db-header .ant-input-affix-wrapper {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  height: 40px;
+}
+
+.cf7db-header .ant-input-affix-wrapper .ant-input {
+  height: auto;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.cf7db-header .ant-input-affix-wrapper:focus,
+.cf7db-header .ant-input-affix-wrapper:focus-within {
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.cf7db-header .ant-input-affix-wrapper:hover {
+  border-color: #d9d9d9 !important;
+}
+
+/* Search loading animation */
+.cf7db-header .ant-input-affix-wrapper .anticon-loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Settings modal select styling */
+.ant-modal .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: #d9d9d9 !important;
+}
+
+.ant-modal .ant-select-focused .ant-select-selector {
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.ant-modal .ant-select .ant-select-selector {
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
+}
+
+.cf7db-header .ant-picker {
+  border-radius: 6px;
+  height: 40px;
+}
+
+.cf7db-header .ant-btn {
+  border-radius: 6px;
+  height: 40px;
+}
+
+.cf7db-header .ant-space {
+  height: 100%;
+  align-items: center;
+}
+
+.cf7db-header .ant-select-selector {
+  height: 40px !important;
+  display: flex;
+  align-items: center;
+}
+
+.cf7db-header .ant-picker-input > input {
+  height: 38px;
+  line-height: 38px;
+}
+
+/* Date Range Picker Enhancements */
+.cf7db-header .ant-picker-panel-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cf7db-header .ant-picker-panel {
+  border: 1px solid #e8e8e8;
+}
+
+.cf7db-header .ant-picker-header {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cf7db-header .ant-picker-content th {
+  color: #8c8c8c;
+  font-weight: 500;
+}
+
+.cf7db-header .ant-picker-cell {
+  border-radius: 4px;
+}
+
+.cf7db-header .ant-picker-cell-inner {
+  border-radius: 4px;
+}
+
+.cf7db-header .ant-picker-cell-selected .ant-picker-cell-inner {
+  background: #1890ff;
+  color: white;
+}
+
+.cf7db-header .ant-picker-cell-in-range {
+  background: #e6f7ff;
+}
+
+.cf7db-header .ant-picker-cell-range-start .ant-picker-cell-inner,
+.cf7db-header .ant-picker-cell-range-end .ant-picker-cell-inner {
+  background: #1890ff;
+  color: white;
+}
+
+/* Quick Date Range Buttons */
+.cf7db-header .ant-picker-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 8px 0;
+}
+
+.cf7db-header .ant-picker-footer .ant-btn {
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  margin: 0 2px;
+  color: #1890ff !important;
+  border: 1px solid #1890ff !important;
+  background-color: transparent !important;
+}
+
+.cf7db-header .ant-picker-footer .ant-btn:hover {
+  background: #f0f8ff !important;
+  border-color: #1890ff !important;
+  color: #1890ff !important;
+}
+
+.cf7db-header .ant-picker-footer .ant-btn:focus {
+  background: transparent !important;
+  border-color: #1890ff !important;
+  color: #1890ff !important;
+}
+
+/* Table Styles */
+.submissions-table {
+  width: 100%;
+}
+
+.submissions-table .ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.submissions-table .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  font-weight: 600;
+  color: #262626;
+  padding: 8px 12px;
+}
+
+.submissions-table .ant-table-tbody > tr > td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.submissions-table .ant-table-tbody > tr:hover > td {
+  background-color: #f5f5f5;
+}
+
+.submissions-table .ant-table-tbody > tr.expanded-row > td {
+  background-color: #fafafa;
+}
+
+/* Pagination Controls */
+.submissions-table .ant-pagination {
+  margin: 0;
+}
+
+.submissions-table .ant-pagination-item {
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.submissions-table .ant-pagination-prev,
+.submissions-table .ant-pagination-next {
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.submissions-table .ant-pagination-item-active {
+  border-color: #1890ff;
+  background-color: #1890ff;
+}
+
+.submissions-table .ant-pagination-item-active a {
+  color: white;
+}
+
+/* Controls Layout */
+.submissions-table .ant-row {
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.submissions-table .ant-space {
+  gap: 8px !important;
+  align-items: center;
+}
+
+.submissions-table .ant-col {
+  display: flex;
+  align-items: center;
+}
+
+/* Buttons */
+.submissions-table .ant-btn {
+  border-radius: 6px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.submissions-table .ant-btn-icon-only {
+  width: 32px;
+  padding: 0;
+}
+
+/* Select Dropdowns */
+.submissions-table .ant-select {
+  border-radius: 6px;
+}
+
+.submissions-table .ant-select-selector {
+  border-radius: 6px !important;
+}
+
+/* Modal Styles */
+.ant-modal {
+  border-radius: 8px;
+}
+
+.ant-modal-header {
+  border-bottom: 1px solid #e8e8e8;
+  padding: 16px 24px;
+}
+
+.ant-modal-title {
+  font-weight: 600;
+  color: #262626;
+}
+
+.ant-modal-body {
+  padding: 24px;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid #e8e8e8;
+  padding: 16px 24px;
+}
+
+/* List Items */
+.ant-list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-list-item:last-child {
+  border-bottom: none;
+}
+
+.ant-list-item-meta-title {
+  font-weight: 500;
+  color: #262626;
+}
+
+.ant-list-item-meta-description {
+  color: #8c8c8c;
+  font-size: 12px;
+}
+
+/* Switch Components */
+.ant-switch {
+  border-radius: 12px;
+}
+
+.ant-switch-checked {
+  background-color: #1890ff;
+}
+
+/* Radio Buttons */
+.ant-radio-button-wrapper {
+  border-radius: 6px;
+  margin-right: 8px;
+}
+
+.ant-radio-button-wrapper:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.ant-radio-button-wrapper:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+/* Form Elements */
+.ant-input,
+.ant-select-selector,
+.ant-picker {
+  border-color: #d9d9d9;
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Typography */
+.ant-typography {
+  color: #262626;
+}
+
+.ant-typography h4 {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Spacing Utilities */
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.ml-8 {
+  margin-left: 8px;
+}
+
+.mr-8 {
+  margin-right: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .cf7db-header > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    height: auto;
+    padding: 12px 16px;
+  }
+  
+  .cf7db-header h1 {
+    margin-bottom: 0;
+  }
+  
+  .cf7db-header .ant-space {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .cf7db-content {
+    padding: 12px;
+  }
+  
+  .cf7db-main-panel {
+    padding: 12px;
+  }
+  
+  .cf7db-header > div {
+    padding: 8px 12px;
+  }
+  
+  .cf7db-header h1 {
+    font-size: 18px;
+  }
+  
+  .cf7db-header .ant-space {
+    gap: 6px;
+  }
+  
+  .cf7db-header .ant-space .ant-select,
+  .cf7db-header .ant-space .ant-input,
+  .cf7db-header .ant-space .ant-picker,
+  .cf7db-header > div .ant-select,
+  .cf7db-header > div .ant-input,
+  .cf7db-header > div .ant-picker {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+  
+  .submissions-table .ant-table {
+    font-size: 12px;
+  }
+  
+  .submissions-table .ant-table-thead > tr > th,
+  .submissions-table .ant-table-tbody > tr > td {
+    padding: 6px 8px;
+  }
+  
+  .submissions-table .ant-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .submissions-table .ant-col {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Custom Scrollbar */
+.submissions-table .ant-table-body::-webkit-scrollbar {
+  height: 8px;
+}
+
+.submissions-table .ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.submissions-table .ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.submissions-table .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Loading States */
+.ant-spin-dot-item {
+  background-color: #1890ff;
+}
+
+/* Empty States */
+.ant-empty {
+  color: #8c8c8c;
+  padding: 20px 0;
+}
+
+.ant-empty-description {
+  color: #8c8c8c;
+}
+
+.submissions-table .ant-table-tbody {
+  min-height: 200px;
+}
+
+.submissions-table .ant-table-placeholder {
+  padding: 20px 0;
+}
+
+/* Checkbox Styles */
+.ant-checkbox-wrapper {
+  font-size: 14px;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+/* Icon Styles */
+.anticon {
+  font-size: 14px;
+}
+
+.ant-btn .anticon {
+  font-size: 14px;
+}
+
+/* Table Expand Icon */
+.ant-table-expand-icon {
+  color: #1890ff;
+  font-size: 16px;
+}
+
+.ant-table-expand-icon:hover {
+  color: #40a9ff;
+}
+
+/* Action Button Hover Effects */
+.submissions-table .ant-btn-text:hover {
+  background-color: #f5f5f5;
+  border-color: #d9d9d9;
+}
+
+.submissions-table .ant-btn-text.ant-btn-dangerous:hover {
+  background-color: #fff2f0;
+  border-color: #ffccc7;
+}
+
+/* Custom Pagination Styles */
+.custom-pagination {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.custom-pagination ul {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.custom-pagination li {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.custom-pagination .ant-pagination-item {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.custom-pagination .ant-pagination-prev,
+.custom-pagination .ant-pagination-next {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.custom-pagination .ant-pagination-jump-prev,
+.custom-pagination .ant-pagination-jump-next {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.custom-pagination .ant-pagination-item a {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.custom-pagination .ant-pagination-prev button,
+.custom-pagination .ant-pagination-next button {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.custom-pagination .ant-pagination-total-text {
+  display: none !important;
+}

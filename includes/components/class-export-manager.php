@@ -1,0 +1,150 @@
+<?php
+/**
+ * Export Manager Component
+ *
+ * @package CF7DBA
+ * @since 1.0.0
+ */
+
+namespace CF7DBA\Components;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class Export_Manager {
+
+	/**
+	 * @var Database_Operations
+	 */
+	private $database_operations;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->database_operations = new Database_Operations();
+	}
+
+	/**
+	 * Generate CSV data from submissions using column configuration
+	 *
+	 * @param array $submissions
+	 * @param string $form_id
+	 * @return string
+	 */
+	public function generate_csv( $submissions, $form_id = '' ) {
+		if ( empty( $submissions ) ) {
+			return '';
+		}
+
+		// Get column configuration from database if form_id is provided
+		$column_config = array();
+		if ( ! empty( $form_id ) ) {
+			$column_config = $this->database_operations->get_column_config( $form_id );
+		}
+
+		// If no column config found, fallback to extracting from submissions
+		if ( empty( $column_config ) ) {
+			$all_fields = array();
+			foreach ( $submissions as $submission ) {
+				if ( isset( $submission['form_data'] ) && is_array( $submission['form_data'] ) ) {
+					$all_fields = array_merge( $all_fields, array_keys( $submission['form_data'] ) );
+				}
+			}
+			$all_fields = array_unique( $all_fields );
+			
+			// Create basic column config from extracted fields
+			$column_config = array();
+			foreach ( $all_fields as $field ) {
+				$column_config[] = array(
+					'key' => $field,
+					'title' => ucwords( str_replace( array( '_', '-' ), ' ', $field ) ),
+					'visible' => true,
+					'order' => count( $column_config )
+				);
+			}
+		}
+
+		// Filter only visible columns
+		$visible_columns = array_filter( $column_config, function( $col ) {
+			return $col['visible'] === true;
+		});
+
+		// Sort by order
+		usort( $visible_columns, function( $a, $b ) {
+			return ( $a['order'] ?? 0 ) - ( $b['order'] ?? 0 );
+		});
+
+		// Start CSV output
+		$output = fopen( 'php://temp', 'r+' );
+
+		// CSV headers - use only visible columns from config
+		$headers = array();
+		foreach ( $visible_columns as $column ) {
+			$headers[] = $column['title'] ?? $column['key'];
+		}
+		fputcsv( $output, $headers );
+
+		// CSV data rows
+		foreach ( $submissions as $submission ) {
+			$row = array();
+
+			// Add data for each visible column based on column configuration
+			foreach ( $visible_columns as $column ) {
+				$field_key = $column['key'];
+				$value = '';
+
+				// Handle metadata fields
+				if ( $field_key === 'id' ) {
+					$value = $submission['id'] ?? '';
+				} elseif ( $field_key === 'form_id' ) {
+					$value = $submission['form_id'] ?? '';
+				} elseif ( $field_key === 'form_title' ) {
+					$value = $submission['form_title'] ?? '';
+				} elseif ( $field_key === 'submit_ip' ) {
+					$value = $submission['submit_ip'] ?? '';
+				} elseif ( $field_key === 'submit_datetime' ) {
+					$value = $submission['submit_datetime'] ?? '';
+				} elseif ( $field_key === 'submit_user_id' ) {
+					$value = $submission['submit_user_id'] ?? '';
+				} else {
+					// Handle form data fields
+					if ( isset( $submission['form_data'][ $field_key ] ) ) {
+						$field_value = $submission['form_data'][ $field_key ];
+						if ( is_array( $field_value ) ) {
+							$value = implode( ', ', $field_value );
+						} else {
+							$value = (string) $field_value;
+						}
+					}
+				}
+
+				$row[] = $value;
+			}
+
+			fputcsv( $output, $row );
+		}
+
+		// Get CSV content
+		rewind( $output );
+		$csv_content = stream_get_contents( $output );
+		fclose( $output );
+
+		return $csv_content;
+	}
+
+	/**
+	 * Download CSV file
+	 *
+	 * @param string $csv_content
+	 * @param string $filename
+	 */
+	public function download_csv( $csv_content, $filename = 'cf7-submissions.csv' ) {
+		header( 'Content-Type: text/csv' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Content-Length: ' . strlen( $csv_content ) );
+		echo $csv_content;
+		exit;
+	}
+}
