@@ -1,7 +1,8 @@
 <?php
 /**
- * Plugin Name:       Contact Form 7 Database – Advanced
- * Description:       Save Contact Form 7 submissions (including multi-step) into a custom database table with admin UI, column management, and CSV export.
+ * Plugin Name:       LeadSync
+ * Plugin URI:        https://wordpress.org/plugins/leadsync/
+ * Description:       LeadSync - Save Contact Form 7 submissions (including multi-step) into a custom database table with modern admin UI, column management, and CSV export. Perfect for Contact Form 7 Database management.
  * Version:           1.0.0
  * Author:            Vaibhav Kumar Saini
  * Author URI:        https://www.linkedin.com/in/vaibhavsaini07/
@@ -58,7 +59,7 @@ register_activation_hook( __FILE__, function () {
 function cf7dba_missing_cf7_notice() {
 	if ( current_user_can( 'activate_plugins' ) ) {
 		$class   = 'notice notice-error';
-		$message = esc_html__( 'Contact Form 7 Database – Advanced requires Contact Form 7 to be installed and active.', 'cf7dba' );
+		$message = esc_html__( 'LeadSync requires Contact Form 7 to be installed and active.', 'cf7dba' );
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), $message );
 	}
 }

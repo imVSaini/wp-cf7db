@@ -59,8 +59,8 @@ class Admin_Interface {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			__( 'Contact Form 7 Database', 'cf7dba' ),
-			__( 'CF7 Database', 'cf7dba' ),
+			__( 'LeadSync', 'cf7dba' ),
+			__( 'LeadSync', 'cf7dba' ),
 			'edit_posts', // Editors have this capability
 			'cf7dba-dashboard',
 			array( $this, 'admin_page' ),
@@ -125,9 +125,9 @@ class Admin_Interface {
 		
 		?>
 		<div class="wrap">
-			<!-- <h1><?php // esc_html_e( 'Contact Form 7 Database', 'cf7dba' ); ?></h1> -->
+			<!-- <h1><?php // esc_html_e( 'LeadSync', 'cf7dba' ); ?></h1> -->
 			<div id="cf7db-admin-app">
-				<p>Loading Contact Form 7 Database...</p>
+				<p>Loading LeadSync...</p>
 				<p>If this message persists, please check the browser console for errors.</p>
 			</div>
 			<!-- Ant Design Message Container -->

@@ -356,9 +356,9 @@ const ContactForm7Database: React.FC = () => {
       <Header className="cf7db-header">
         <div style={headerStyles.container}>
           {/* Title */}
-          <h1 style={headerStyles.title}>
-            Contact Form 7 Database
-          </h1>
+           <h1 style={headerStyles.title}>
+             LeadSync
+           </h1>
           
           
           {/* Controls */}
@@ -736,7 +736,7 @@ const ContactForm7Database: React.FC = () => {
           <Form.Item
             name="selectedFormsForCsv"
             label="Select Forms for CSV Leads via Mail"
-            tooltip="Choose which Contact Form 7 forms to include in monthly CSV reports"
+            tooltip="Choose which forms to include in monthly CSV reports"
             dependencies={['monthlyCsvLeads']}
           >
             <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.monthlyCsvLeads !== currentValues.monthlyCsvLeads} noStyle>

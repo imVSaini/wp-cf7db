@@ -5,7 +5,7 @@ import { execSync } from 'child_process';
 import process from 'process';
 
 // Configuration
-const PLUGIN_NAME = 'contact-form-7-database-advanced';
+const PLUGIN_NAME = 'leadsync';
 const PLUGIN_VERSION = '1.0.0';
 const OUTPUT_DIR = 'plugin';
 const BUILD_DIR = 'build';
@@ -216,9 +216,10 @@ function createPluginZip() {
   // Create readme.txt if it doesn't exist
   const readmePath = path.join(tempPluginDir, 'readme.txt');
   if (!fs.existsSync(readmePath)) {
-    const readmeContent = `=== Contact Form 7 Database – Advanced ===
+    const readmeContent = `=== LeadSync ===
 Contributors: vaibhavsaini07
-Tags: contact-form-7, database, submissions, admin, multi-step, export, csv
+Plugin URI: https://wordpress.org/plugins/leadsync/
+Tags: contact-form-7, contact-form-7-database, cf7-database, form-submissions, database, submissions, admin, multi-step, export, csv, leadsync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 8.0
@@ -226,11 +227,11 @@ Stable tag: ${PLUGIN_VERSION}
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Save Contact Form 7 submissions (including multi-step) into a custom database table with admin UI, column management, and CSV export.
+LeadSync - Save Contact Form 7 submissions (including multi-step) into a custom database table with modern admin UI, column management, and CSV export. Perfect for Contact Form 7 Database management.
 
 == Description ==
 
-Contact Form 7 Database – Advanced provides a comprehensive solution for managing Contact Form 7 submissions with a modern React-based admin interface. Built with TypeScript, React, and Ant Design for optimal performance and user experience.
+LeadSync provides a comprehensive solution for managing Contact Form 7 submissions with a modern React-based admin interface. Built with TypeScript, React, and Ant Design for optimal performance and user experience.
 
 **Key Features:**
 * **Multi-step Form Support** - Capture submissions from complex multi-step Contact Form 7 forms
@@ -243,10 +244,10 @@ Contact Form 7 Database – Advanced provides a comprehensive solution for manag
 
 == Installation ==
 
-1. Upload the plugin files to the /wp-content/plugins/contact-form-7-database-advanced directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the /wp-content/plugins/leadsync directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Ensure Contact Form 7 is installed and active
-4. Access the admin interface via 'CF7 Database' in the WordPress admin menu
+4. Access the admin interface via 'LeadSync' in the WordPress admin menu
 
 == Changelog ==
 
@@ -297,7 +298,7 @@ Initial release of the advanced plugin with comprehensive features.
 }
 
 async function main() {
-  console.log('🚀 Building Contact Form 7 Database – Advanced Plugin');
+  console.log('🚀 Building LeadSync Plugin');
   console.log('====================================================');
   
   // Validate plugin structure first

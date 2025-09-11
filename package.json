@@ -1,7 +1,7 @@
 {
-  "name": "contact-form-7-database",
+  "name": "leadsync",
   "version": "1.0.0",
-  "description": "WordPress plugin for managing Contact Form 7 submissions with React admin interface",
+  "description": "LeadSync - WordPress plugin for managing Contact Form 7 submissions with React admin interface",
   "main": "index.js",
   "scripts": {
     "dev": "vite",

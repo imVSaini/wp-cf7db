@@ -1,10 +1,12 @@
-# Contact Form 7 Database – Advanced
+# LeadSync - Contact Form 7 Database
 
-Save Contact Form 7 submissions (including multi-step) into a custom database table with admin UI, column management, and CSV export.
+**WordPress Plugin**: [wordpress.org/plugins/leadsync](https://wordpress.org/plugins/leadsync/)
+
+LeadSync is a powerful Contact Form 7 Database plugin that saves Contact Form 7 submissions (including multi-step) into a custom database table with admin UI, column management, and CSV export.
 
 ## Description
 
-Contact Form 7 Database – Advanced is a powerful WordPress plugin that automatically saves all Contact Form 7 form submissions to a custom database table. It provides a modern, user-friendly admin interface to view, manage, and export your form data.
+LeadSync is a powerful WordPress plugin that automatically saves all Contact Form 7 form submissions to a custom database table. It provides a modern, user-friendly admin interface to view, manage, and export your form data.
 
 ### Key Features
 
@@ -73,7 +75,7 @@ Yes, you can show/hide columns and customize the table display through the colum
 ## Upgrade Notice
 
 ### 1.0.0
-First release of Contact Form 7 Database – Advanced. Install to start saving and managing your Contact Form 7 submissions.
+First release of LeadSync. Install to start saving and managing your Contact Form 7 submissions.
 
 ## Support
 
