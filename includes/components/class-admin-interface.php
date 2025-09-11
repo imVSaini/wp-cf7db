@@ -30,6 +30,11 @@ class Admin_Interface {
 	private $export_manager;
 
 	/**
+	 * @var Migration_Manager
+	 */
+	private $migration_manager;
+
+	/**
 	 * Constructor
 	 *
 	 * @param Form_Manager $form_manager
@@ -40,6 +45,7 @@ class Admin_Interface {
 		$this->form_manager = $form_manager;
 		$this->submission_manager = $submission_manager;
 		$this->export_manager = $export_manager;
+		$this->migration_manager = new Migration_Manager();
 
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
@@ -52,6 +58,11 @@ class Admin_Interface {
 		add_action( 'wp_ajax_cf7dba_get_settings', array( $this, 'ajax_get_settings' ) );
 		add_action( 'wp_ajax_cf7dba_save_column_config', array( $this, 'ajax_save_column_config' ) );
 		add_action( 'wp_ajax_cf7dba_get_column_config', array( $this, 'ajax_get_column_config' ) );
+		add_action( 'wp_ajax_cf7dba_check_migration', array( $this, 'ajax_check_migration' ) );
+		add_action( 'wp_ajax_cf7dba_migrate_data', array( $this, 'ajax_migrate_data' ) );
+		add_action( 'wp_ajax_cf7dba_export_cfdb7_backup', array( $this, 'ajax_export_cfdb7_backup' ) );
+		add_action( 'wp_ajax_cf7dba_cleanup_cfdb7', array( $this, 'ajax_cleanup_cfdb7' ) );
+		add_action( 'wp_ajax_cf7dba_debug_migration', array( $this, 'ajax_debug_migration' ) );
 	}
 
 	/**
@@ -420,6 +431,114 @@ class Admin_Interface {
 		$column_config = $this->submission_manager->get_column_config( $form_id );
 
 		wp_send_json_success( array( 'column_config' => $column_config ) );
+	}
+
+	/**
+	 * AJAX: Check migration status
+	 */
+	public function ajax_check_migration() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		// Check if user has access to manage data
+		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			return;
+		}
+
+		$cfdb7_exists = $this->migration_manager->cfdb7_data_exists();
+		$cfdb7_count = $this->migration_manager->get_cfdb7_data_count();
+		$progress = $this->migration_manager->get_migration_progress();
+
+		wp_send_json_success( array(
+			'cfdb7_exists' => $cfdb7_exists,
+			'cfdb7_count' => $cfdb7_count,
+			'progress' => $progress
+		) );
+	}
+
+	/**
+	 * AJAX: Migrate data from CFDB7
+	 */
+	public function ajax_migrate_data() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		// Check if user has access to manage data
+		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			return;
+		}
+
+		$batch_size = (int) ( $_POST['batch_size'] ?? 100 );
+		$offset = (int) ( $_POST['offset'] ?? 0 );
+
+		$result = $this->migration_manager->migrate_cfdb7_data( $batch_size, $offset );
+
+		if ( $result['success'] ) {
+			wp_send_json_success( $result );
+		} else {
+			wp_send_json_error( $result );
+		}
+	}
+
+	/**
+	 * AJAX: Export CFDB7 backup
+	 */
+	public function ajax_export_cfdb7_backup() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		// Check if user has access to manage data
+		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			return;
+		}
+
+		$filepath = $this->migration_manager->export_cfdb7_data_to_csv();
+
+		if ( $filepath ) {
+			wp_send_json_success( array( 
+				'message' => __( 'CFDB7 data exported successfully', 'cf7dba' ),
+				'filepath' => $filepath
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to export CFDB7 data', 'cf7dba' ) ) );
+		}
+	}
+
+	/**
+	 * AJAX: Cleanup CFDB7 data
+	 */
+	public function ajax_cleanup_cfdb7() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		// Check if user has access to manage data
+		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			return;
+		}
+
+		$success = $this->migration_manager->cleanup_cfdb7_data();
+
+		if ( $success ) {
+			wp_send_json_success( array( 'message' => __( 'CFDB7 data cleaned up successfully', 'cf7dba' ) ) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to cleanup CFDB7 data or migration not complete', 'cf7dba' ) ) );
+		}
+	}
+
+	/**
+	 * AJAX: Debug migration information
+	 */
+	public function ajax_debug_migration() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		// Check if user has access to manage data
+		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			return;
+		}
+
+		$debug_info = $this->migration_manager->get_debug_info();
+		wp_send_json_success( $debug_info );
 	}
 
 }

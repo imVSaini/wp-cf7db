@@ -197,6 +197,59 @@ class WordPressApiService {
     throw new Error(response.message || 'Failed to export CSV');
   }
 
+  // Migration API methods
+  async checkMigration(): Promise<{
+    cfdb7_exists: boolean;
+    cfdb7_count: number;
+    progress: {
+      cfdb7_total: number;
+      leadsync_total: number;
+      progress_percentage: number;
+    };
+  }> {
+    const response = await this.post<{
+      cfdb7_exists: boolean;
+      cfdb7_count: number;
+      progress: {
+        cfdb7_total: number;
+        leadsync_total: number;
+        progress_percentage: number;
+      };
+    }>('cf7dba_check_migration', {});
+    return response.data;
+  }
+
+  async migrateData(params: {
+    batch_size: number;
+    offset: number;
+  }): Promise<{
+    success: boolean;
+    migrated: number;
+    total: number;
+    errors: string[];
+    has_more: boolean;
+    message?: string;
+  }> {
+    const response = await this.post<{
+      success: boolean;
+      migrated: number;
+      total: number;
+      errors: string[];
+      has_more: boolean;
+      message?: string;
+    }>('cf7dba_migrate_data', params);
+    return response.data;
+  }
+
+  async exportCFDB7Backup(): Promise<{ filepath: string }> {
+    const response = await this.post<{ filepath: string }>('cf7dba_export_cfdb7_backup', {});
+    return response.data;
+  }
+
+  async cleanupCFDB7(): Promise<void> {
+    await this.post('cf7dba_cleanup_cfdb7', {});
+  }
+
   // Utility method to check if user has manage options permission
   hasManageOptionsPermission(): boolean {
     return window.cf7dba_ajax?.canManageOptions || false;

@@ -91,6 +91,26 @@ export const useApi = () => {
     return executeApiCall(() => apiService.exportCSV(params));
   }, [executeApiCall]);
 
+  // Migration API hooks
+  const checkMigration = useCallback(async () => {
+    return executeApiCall(() => apiService.checkMigration());
+  }, [executeApiCall]);
+
+  const migrateData = useCallback(async (params: {
+    batch_size: number;
+    offset: number;
+  }) => {
+    return executeApiCall(() => apiService.migrateData(params));
+  }, [executeApiCall]);
+
+  const exportCFDB7Backup = useCallback(async () => {
+    return executeApiCall(() => apiService.exportCFDB7Backup());
+  }, [executeApiCall]);
+
+  const cleanupCFDB7 = useCallback(async () => {
+    return executeApiCall(() => apiService.cleanupCFDB7());
+  }, [executeApiCall]);
+
   // Utility methods
   const hasManageOptionsPermission = useCallback(() => {
     return apiService.hasManageOptionsPermission();
@@ -120,6 +140,12 @@ export const useApi = () => {
     getColumnConfig,
     saveColumnConfig,
     exportCSV,
+    
+    // Migration methods
+    checkMigration,
+    migrateData,
+    exportCFDB7Backup,
+    cleanupCFDB7,
     
     // Utility methods
     hasManageOptionsPermission,

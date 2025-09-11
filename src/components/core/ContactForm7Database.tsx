@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Layout, Select, Button, Input, DatePicker, Space, Modal, Form, Switch, Select as AntSelect, Divider, Typography, message } from 'antd';
-import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, AppstoreOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
+import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, AppstoreOutlined, LoadingOutlined, SettingOutlined, DatabaseOutlined } from '@ant-design/icons';
 import SubmissionsTable from './SubmissionsTable';
+import MigrationModal from '../modals/MigrationModal';
 import { toast } from '../ui/shared';
 import { useApi, useFormData, useSubmissions } from '../../hooks/useApi';
 import { TableSettings } from '../../types';
@@ -21,6 +22,7 @@ const ContactForm7Database: React.FC = () => {
     pageSize: 15,
     total: 0
   });
+  const [showMigrationModal, setShowMigrationModal] = useState(false);
 
   // Memoize date range conversion to prevent infinite re-renders
   const dateRangeString = useMemo((): [string, string] | null => {
@@ -395,6 +397,23 @@ const ContactForm7Database: React.FC = () => {
             title="Export to CSV"
           />
           
+          {/* Migration Button */}
+          <Button
+            icon={<DatabaseOutlined />}
+            onClick={() => setShowMigrationModal(true)}
+            style={{ 
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #d9d9d9',
+              borderRadius: '6px',
+              backgroundColor: 'white'
+            }}
+            title="Migrate from CFDB7"
+          />
+          
           {/* Search Input */}
           <Input
             placeholder="Type Something..."
@@ -763,6 +782,12 @@ const ContactForm7Database: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
+      
+      {/* Migration Modal */}
+      <MigrationModal
+        visible={showMigrationModal}
+        onClose={() => setShowMigrationModal(false)}
+      />
     </Layout>
   );
 };
