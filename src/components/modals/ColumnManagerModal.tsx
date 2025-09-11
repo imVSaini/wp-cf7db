@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Input, Switch, Space, Typography } from 'antd';
 import { DragOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { ColumnConfig, FormField } from '../types';
+import { ColumnConfig, FormField } from '../../types';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 

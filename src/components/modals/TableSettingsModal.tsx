@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Switch, Radio, Select, Button, Space, Divider } from 'antd';
-import { TableSettings } from '../types';
+import { TableSettings } from '../../types';
 
 interface TableSettingsModalProps {
   visible: boolean;

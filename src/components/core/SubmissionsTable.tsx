@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Table, Button, Space, Pagination, Select, Typography, Row, Col, message, ConfigProvider } from 'antd';
 import { SettingOutlined, PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined, ColumnHeightOutlined } from '@ant-design/icons';
-import { Submission, PaginationType, FormField, ColumnConfig, TableSettings } from '../types';
-import ColumnSettingsModal from './ColumnSettingsModal';
-import TableSettingsModal from './TableSettingsModal';
-import SubmissionDetailModal from './SubmissionDetailModal';
-import ColumnManagerModal from './ColumnManagerModal';
-import { DeleteConfirmationModal, toast } from './shared';
+import { Submission, PaginationType, FormField, ColumnConfig, TableSettings } from '../../types';
+import ColumnSettingsModal from '../modals/ColumnSettingsModal';
+import TableSettingsModal from '../modals/TableSettingsModal';
+import SubmissionDetailModal from '../modals/SubmissionDetailModal';
+import ColumnManagerModal from '../modals/ColumnManagerModal';
+import { DeleteConfirmationModal, toast } from '../ui/shared';
+import { useApi } from '../../hooks/useApi';
 
 const { Text: TypographyText } = Typography;
 
@@ -18,6 +19,8 @@ interface SubmissionsTableProps {
   onPaginationChange: (_pagination: PaginationType) => void;
   onRefresh?: () => void;
   formId?: string;
+  tableSettings: TableSettings;
+  onTableSettingsChange: (_settings: TableSettings) => void;
 }
 
 const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
@@ -27,7 +30,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   formFields,
   onPaginationChange,
   onRefresh,
-  formId
+  formId,
+  tableSettings,
+  onTableSettingsChange
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
@@ -41,20 +46,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   const [columns, setColumns] = useState<ColumnConfig[]>([]);
   const [bulkDeleteVisible, setBulkDeleteVisible] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
-  const [tableSettings, setTableSettings] = useState<TableSettings>({
-    bordered: true,
-    title: true,
-    columnHeader: true,
-    expandable: true,
-    fixedHeader: true,
-    ellipsis: true,
-    footer: true,
-    checkbox: true,
-    size: 'middle',
-    tableScroll: 'fixed',
-    paginationTop: 'None',
-    paginationBottom: 'Bottom Left'
-  });
+
+  // API hooks
+  const { getColumnConfig, saveColumnConfig, deleteSubmission: apiDeleteSubmission } = useApi();
   const [sortField, setSortField] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'ascend' | 'descend' | undefined>(undefined);
 
@@ -62,68 +56,33 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   const loadColumnConfig = useCallback(async () => {
     if (!formId) return;
 
-    try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_get_column_config',
-          nonce: window.cf7dba_ajax?.nonce || '',
-          form_id: formId
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data.column_config) {
-          console.log('CF7DBA: Loading column config from database:', data.data.column_config);
-          setColumns(data.data.column_config);
-        } else {
-          console.log('CF7DBA: No column config found in database, will use defaults');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load column config:', error);
+    const columnConfig = await getColumnConfig(formId);
+    if (columnConfig && columnConfig.length > 0) {
+      console.log('CF7DBA: Loading column config from database:', columnConfig);
+      setColumns(columnConfig);
+    } else {
+      console.log('CF7DBA: No column config found in database, will use defaults');
     }
-  }, [formId]);
+  }, [formId, getColumnConfig]);
 
   // Save column configuration to database
-  const saveColumnConfig = useCallback(async (columnConfig: ColumnConfig[]) => {
+  const saveColumnConfigToDb = useCallback(async (columnConfig: ColumnConfig[]) => {
     if (!formId) return;
 
     try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_save_column_config',
-          nonce: window.cf7dba_ajax?.nonce || '',
-          form_id: formId,
-          column_config: JSON.stringify(columnConfig)
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          message.success('Column configuration saved successfully');
-        } else {
-          message.error(data.data?.message || 'Failed to save column configuration');
-        }
-      }
+      await saveColumnConfig(formId, columnConfig);
+      message.success('Column configuration saved successfully');
     } catch (error) {
       console.error('Failed to save column config:', error);
       message.error('Failed to save column configuration');
     }
-  }, [formId]);
+  }, [formId, saveColumnConfig]);
 
   // Load column configuration when formId changes or component mounts
   useEffect(() => {
     if (formId) {
+      // Clear existing columns first
+      setColumns([]);
       loadColumnConfig();
     }
   }, [formId, loadColumnConfig]);
@@ -182,13 +141,13 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
     return cols;
   }, []);
 
-  // Generate default columns when formFields change (only if no columns exist)
+  // Generate default columns when formFields change
   useEffect(() => {
-    if (columns.length === 0) {
+    if (formFields.length > 0) {
       const defaultColumns = generateDefaultColumns(formFields);
       setColumns(defaultColumns);
     }
-  }, [formFields, generateDefaultColumns, columns.length]);
+  }, [formFields, generateDefaultColumns]);
 
   // Helper function to get pagination alignment
   const getPaginationJustify = (position: string): 'start' | 'center' | 'end' => {
@@ -297,43 +256,25 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   // Consolidated delete function
   const deleteSubmission = useCallback(async (submission: Submission, showToast: boolean = true): Promise<void> => {
     try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_delete_submission',
-          nonce: window.cf7dba_ajax?.nonce || '',
-          submission_id: submission.id.toString()
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          if (showToast) {
-            toast.success('Submission deleted successfully');
-          }
-          onRefresh?.();
-        } else {
-          // Handle permission errors directly
-          const errorMessage = data.data?.message || 'Failed to delete submission';
-          if (errorMessage.includes('permission') || errorMessage.includes('Permission')) {
-            if (showToast) {
-              message.warning('You do not have permission to delete submissions');
-            }
-          } else {
-            console.error('Failed to delete submission:', errorMessage);
-          }
+      await apiDeleteSubmission(submission.id);
+      if (showToast) {
+        toast.success('Submission deleted successfully');
+      }
+      onRefresh?.();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete submission';
+      if (errorMessage.includes('permission') || errorMessage.includes('Permission')) {
+        if (showToast) {
+          message.warning('You do not have permission to delete submissions');
         }
       } else {
-        console.error('Failed to delete submission - HTTP error:', response.status);
+        console.error('Failed to delete submission:', errorMessage);
+        if (showToast) {
+          message.error(errorMessage);
+        }
       }
-    } catch (error) {
-      console.error('Error deleting submission:', error);
     }
-  }, [onRefresh]);
+  }, [onRefresh, apiDeleteSubmission]);
 
   const handleDeleteSubmission = useCallback(async (submission: Submission): Promise<void> => {
     try {
@@ -349,13 +290,13 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
     setColumns(newColumns);
     // Only save to database if user has manage_options permission (admin only)
     if (window.cf7dba_ajax?.canManageOptions) {
-      saveColumnConfig(newColumns);
+      saveColumnConfigToDb(newColumns);
     }
-  }, [saveColumnConfig]);
+  }, [saveColumnConfigToDb]);
 
   const handleTableSettingsSave = useCallback((newSettings: TableSettings) => {
-    setTableSettings(newSettings);
-  }, []);
+    onTableSettingsChange(newSettings);
+  }, [onTableSettingsChange]);
 
   const confirmDelete = useCallback(async () => {
     if (submissionToDelete) {
@@ -375,32 +316,13 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
         const submission = submissions.find(s => s.id === id);
         if (submission) {
           try {
-            const response = await fetch('/wp-admin/admin-ajax.php', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: new URLSearchParams({
-                action: 'cf7dba_delete_submission',
-                nonce: window.cf7dba_ajax?.nonce || '',
-                submission_id: submission.id.toString()
-              })
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              if (data.success) {
-                return { success: true, id };
-              } else {
-                const errorMessage = data.data?.message || 'Failed to delete submission';
-                return { success: false, id, error: errorMessage, isPermissionError: errorMessage.includes('permission') || errorMessage.includes('Permission') };
-              }
-            } else {
-              return { success: false, id, error: 'HTTP error: ' + response.status };
-            }
+            await apiDeleteSubmission(submission.id);
+            return { success: true, id };
           } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const isPermissionError = errorMessage.includes('permission') || errorMessage.includes('Permission');
             console.error(`Failed to delete submission ${id}:`, error);
-            return { success: false, id, error: error instanceof Error ? error.message : 'Unknown error' };
+            return { success: false, id, error: errorMessage, isPermissionError };
           }
         }
         return { success: false, id, error: 'Submission not found' };
@@ -452,7 +374,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
     } finally {
       setBulkDeleting(false);
     }
-  }, [selectedRowKeys, submissions, onRefresh]);
+  }, [selectedRowKeys, submissions, onRefresh, apiDeleteSubmission]);
 
   const handleBulkDeleteClick = useCallback(() => {
     if (selectedRowKeys.length === 0) {

@@ -2,11 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Layout, Select, Button, Input, DatePicker, Space, Modal, Form, Switch, Select as AntSelect, Divider, Typography, message } from 'antd';
 import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, AppstoreOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
 import SubmissionsTable from './SubmissionsTable';
-import { Submission, FormField } from '../types';
-import { toast } from './shared';
+import { toast } from '../ui/shared';
+import { useApi, useFormData, useSubmissions } from '../../hooks/useApi';
+import { TableSettings } from '../../types';
 import dayjs, { Dayjs } from 'dayjs';
-
-// Global type declaration for WordPress AJAX
 
 const { Header, Content } = Layout;
 const { RangePicker } = DatePicker;
@@ -14,153 +13,56 @@ const { RangePicker } = DatePicker;
 const ContactForm7Database: React.FC = () => {
   const [forms, setForms] = useState<Array<{id: string, title: string}>>([]);
   const [selectedForm, setSelectedForm] = useState<string>('');
-  const [formFields, setFormFields] = useState<FormField[]>([]);
-  const [fieldsLoading, setFieldsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 15,
     total: 0
   });
 
-  // Fetch form fields for the selected form
-  const fetchFormFields = useCallback(async () => {
-    if (!selectedForm) return;
-    
-    setFieldsLoading(true);
-    try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_get_form_fields',
-          nonce: window.cf7dba_ajax?.nonce || '',
-          form_id: selectedForm
-        })
-      });
+  // Memoize date range conversion to prevent infinite re-renders
+  const dateRangeString = useMemo((): [string, string] | null => {
+    return dateRange ? [dateRange[0].format('YYYY-MM-DD'), dateRange[1].format('YYYY-MM-DD')] : null;
+  }, [dateRange]);
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data.fields) {
-          setFormFields(data.data.fields);
-        } else {
-          console.error('Failed to fetch form fields:', data.data);
-          setFormFields([]);
-        }
-      } else {
-        console.error('HTTP error fetching form fields:', response.status);
-        setFormFields([]);
-      }
-    } catch (error) {
-      console.error('Error fetching form fields:', error);
-      setFormFields([]);
-    } finally {
-      setFieldsLoading(false);
+  // API hooks
+  const { getForms, getSettings, saveSettings, exportCSV, error: apiError } = useApi();
+  const { formFields, loading: fieldsLoading, error: fieldsError } = useFormData(selectedForm);
+  const { submissions, total, loadSubmissions, loading: submissionsLoading, error: submissionsError } = useSubmissions(
+    selectedForm,
+    pagination,
+    searchQuery,
+    dateRangeString
+  );
+
+  // Show error messages
+  useEffect(() => {
+    if (apiError) {
+      message.error(`API Error: ${apiError}`);
     }
-  }, [selectedForm]);
+    if (fieldsError) {
+      message.error(`Form Fields Error: ${fieldsError}`);
+    }
+    if (submissionsError) {
+      message.error(`Submissions Error: ${submissionsError}`);
+    }
+  }, [apiError, fieldsError, submissionsError]);
+
 
   // Fetch available forms from API
   const fetchForms = useCallback(async () => {
-    try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_get_forms',
-          nonce: window.cf7dba_ajax?.nonce || ''
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setForms(data.data);
-          // Auto-select first form if available and no form is selected
-          if (data.data.length > 0) {
-            const firstFormId = data.data[0].id;
-            setSelectedForm(prev => prev || firstFormId);
-          }
-        } else {
-          console.error('Failed to fetch forms:', data.data);
-          setForms([]);
-        }
-      } else {
-        console.error('HTTP error fetching forms:', response.status);
-        setForms([]);
+    const formsData = await getForms();
+    if (formsData) {
+      setForms(formsData);
+      // Auto-select first form if available and no form is selected
+      if (formsData.length > 0) {
+        const firstFormId = formsData[0].id;
+        setSelectedForm(prev => prev || firstFormId);
       }
-    } catch (error) {
-      console.error('Error fetching forms:', error);
-      setForms([]);
     }
-  }, []);
-
-  // Fetch submissions from API
-  const fetchSubmissions = useCallback(async () => {
-    if (!selectedForm) return;
-    
-    setLoading(true);
-    try {
-      const requestParams = {
-        action: 'cf7dba_get_submissions',
-        nonce: window.cf7dba_ajax?.nonce || '',
-        form_id: selectedForm,
-        page: pagination.current.toString(),
-        per_page: pagination.pageSize.toString(),
-        search: searchQuery,
-        start_date: dateRange?.[0]?.format('YYYY-MM-DD') || '',
-        end_date: dateRange?.[1]?.format('YYYY-MM-DD') || ''
-      };
-
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(requestParams)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setSubmissions(data.data.submissions || []);
-          setPagination(prev => ({
-            ...prev,
-            total: data.data.total || 0,
-            pages: data.data.pages || 1
-          }));
-        } else {
-          // Handle permission errors directly
-          const errorMessage = data.data?.message || 'Failed to fetch submissions';
-          console.log('Fetch error:', errorMessage);
-          if (errorMessage.includes('permission') || errorMessage.includes('Permission')) {
-            toast.warning('You do not have permission to view submissions');
-          } else {
-            console.error('Failed to fetch submissions:', data.data);
-          }
-          setSubmissions([]);
-          setPagination(prev => ({ ...prev, total: 0, pages: 1 }));
-        }
-      } else {
-        console.error('HTTP error:', response.status);
-        setSubmissions([]);
-        setPagination(prev => ({ ...prev, total: 0, pages: 1 }));
-      }
-    } catch (error) {
-      console.error('Error fetching submissions:', error);
-      setSubmissions([]);
-      setPagination(prev => ({ ...prev, total: 0, pages: 1 }));
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedForm, searchQuery, dateRange, pagination.current, pagination.pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [getForms]);
 
   // Debounced search effect
   const debouncedSearch = useMemo(() => {
@@ -178,34 +80,63 @@ const ContactForm7Database: React.FC = () => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [settingsForm] = Form.useForm();
 
+  // Table settings state (persists across form switches)
+  const [tableSettings, setTableSettings] = useState<TableSettings>({
+    bordered: true,
+    title: true,
+    columnHeader: true,
+    expandable: true,
+    fixedHeader: true,
+    ellipsis: true,
+    footer: true,
+    checkbox: true,
+    size: 'middle',
+    tableScroll: 'fixed',
+    paginationTop: 'None',
+    paginationBottom: 'Bottom Left'
+  });
+
   // Fetch available forms on component mount
   useEffect(() => {
     fetchForms();
   }, [fetchForms]);
 
-  // Consolidated effect for form selection, date range, and search changes
+  // Update pagination total when submissions change
+  useEffect(() => {
+    setPagination(prev => ({
+      ...prev,
+      total: total
+    }));
+  }, [total]);
+
+  // Immediate effect for form selection and date range changes
+  useEffect(() => {
+    if (!selectedForm) return;
+    
+    // Reset search loading state when form or date range changes
+    setIsSearching(false);
+    // Submissions will be loaded automatically by the useSubmissions hook
+  }, [selectedForm, dateRange]);
+
+  // Debounced effect for search queries only
   useEffect(() => {
     if (!selectedForm) return;
 
-    // Clear previous form fields when switching forms
-    setFormFields([]);
-    fetchFormFields();
-
-    // Always debounce search queries for better UX
+    // Only debounce search queries for better UX
     setIsSearching(true);
     debouncedSearch(() => {
-      fetchSubmissions();
+      // Submissions will be loaded automatically by the useSubmissions hook
       setIsSearching(false);
-    }, 300); // Reduced delay for better responsiveness
-  }, [selectedForm, dateRange, searchQuery, fetchFormFields, fetchSubmissions, debouncedSearch]);
+    }, 300);
+  }, [searchQuery, debouncedSearch, selectedForm]);
 
   const handleFilter = useCallback(() => {
     // Reset to first page and fetch filtered data
     setPagination(prev => ({ ...prev, current: 1 }));
     setIsSearching(true);
-    fetchSubmissions();
+    // Submissions will be loaded automatically by the useSubmissions hook
     setIsSearching(false);
-  }, [fetchSubmissions]);
+  }, []);
 
 
   const handleQuickDateRange = useCallback((range: string) => {
@@ -245,28 +176,11 @@ const ContactForm7Database: React.FC = () => {
   const handleSettingsOpen = useCallback(async () => {
     setSettingsVisible(true);
     // Load settings from backend
-    try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_get_settings',
-          nonce: window.cf7dba_ajax?.nonce || ''
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          settingsForm.setFieldsValue(data.data.settings);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load settings:', error);
+    const settings = await getSettings();
+    if (settings) {
+      settingsForm.setFieldsValue(settings);
     }
-  }, [settingsForm]);
+  }, [settingsForm, getSettings]);
 
   const handleSettingsClose = useCallback(() => {
     setSettingsVisible(false);
@@ -283,37 +197,14 @@ const ContactForm7Database: React.FC = () => {
         )
       );
 
-      const formData = new URLSearchParams({
-        action: 'cf7dba_save_settings',
-        nonce: window.cf7dba_ajax?.nonce || '',
-        ...Object.fromEntries(
-          Object.entries(filteredValues).map(([key, value]) => [`settings[${key}]`, value])
-        )
-      });
-
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          toast.success('Settings saved successfully');
-          setSettingsVisible(false);
-        } else {
-          console.error('Failed to save settings:', data.data?.message);
-        }
-      } else {
-        console.error('Failed to save settings - HTTP error:', response.status);
-      }
+      await saveSettings(filteredValues);
+      toast.success('Settings saved successfully');
+      setSettingsVisible(false);
     } catch (error) {
       console.error('Failed to save settings:', error);
+      message.error('Failed to save settings');
     }
-  }, []);
+  }, [saveSettings]);
 
   // Handle access control changes and reset permissions
   const handleAccessChange = useCallback((fieldName: string, checked: boolean) => {
@@ -385,77 +276,80 @@ const ContactForm7Database: React.FC = () => {
     }
 
     try {
-      const response = await fetch('/wp-admin/admin-ajax.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'cf7dba_export_csv',
-          nonce: window.cf7dba_ajax?.nonce || '',
-          form_id: selectedForm,
-          start_date: dateRange?.[0]?.format('YYYY-MM-DD') || '',
-          end_date: dateRange?.[1]?.format('YYYY-MM-DD') || ''
-        })
+      const csvData = await exportCSV({
+        form_id: selectedForm,
+        start_date: dateRange?.[0]?.format('YYYY-MM-DD') || '',
+        end_date: dateRange?.[1]?.format('YYYY-MM-DD') || ''
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          // Generate filename with form name and date range
-          const selectedFormData = formOptions.find(f => f.value === selectedForm);
-          const formNameForFile = selectedFormData?.label || `form_${selectedForm}`;
-          const dateStr = dateRange?.[0] ? `_${dateRange[0].format('YYYY-MM-DD')}` : '';
-          const endDateStr = dateRange?.[1] ? `_to_${dateRange[1].format('YYYY-MM-DD')}` : '';
-          const filename = `cf7_${formNameForFile.replace(/[^a-zA-Z0-9]/g, '_')}${dateStr}${endDateStr}.csv`;
-          
-          // Create and download CSV file
-          const blob = new Blob([data.data.csv_data], { type: 'text/csv;charset=utf-8;' });
-          
-          // Use a more compatible download method
-          if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
-            // For IE/Edge
-            (window.navigator as any).msSaveOrOpenBlob(blob, filename);
-          } else {
-            // For modern browsers
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.download = filename;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Clean up the URL object after a short delay
-            setTimeout(() => {
-              URL.revokeObjectURL(url);
-            }, 100);
-          }
-          
-          // Generate concise success message
-          const formName = formOptions.find(f => f.value === selectedForm)?.label || 'form';
-          const dateInfo = dateRange?.[0] ? 
-            ` (${dateRange[0].format('MM/DD')} to ${dateRange[1]?.format('MM/DD') || 'now'})` : 
-            ' (all data)';
-          toast.success(`CSV exported: ${formName}${dateInfo}`);
+      if (csvData) {
+        // Generate filename with form name and date range
+        const selectedFormData = formOptions.find(f => f.value === selectedForm);
+        const formNameForFile = selectedFormData?.label || `form_${selectedForm}`;
+        const dateStr = dateRange?.[0] ? `_${dateRange[0].format('YYYY-MM-DD')}` : '';
+        const endDateStr = dateRange?.[1] ? `_to_${dateRange[1].format('YYYY-MM-DD')}` : '';
+        const filename = `cf7_${formNameForFile.replace(/[^a-zA-Z0-9]/g, '_')}${dateStr}${endDateStr}.csv`;
+        
+        // Create and download CSV file
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        
+        // Use a more compatible download method
+        if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+          // For IE/Edge
+          (window.navigator as any).msSaveOrOpenBlob(blob, filename);
         } else {
-          const errorMessage = data.data?.message || 'Failed to export data';
-          if (errorMessage.includes('permission') || errorMessage.includes('Permission')) {
-            toast.warning('You do not have permission to export data');
-          } else {
-            message.error(errorMessage);
-          }
+          // For modern browsers
+          const link = document.createElement('a');
+          const url = URL.createObjectURL(blob);
+          link.href = url;
+          link.download = filename;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Clean up the URL object after a short delay
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 100);
         }
-      } else {
-        message.error('Failed to export data - HTTP error: ' + response.status);
+        
+        // Generate concise success message
+        const formName = formOptions.find(f => f.value === selectedForm)?.label || 'form';
+        const dateInfo = dateRange?.[0] ? 
+          ` (${dateRange[0].format('MM/DD')} to ${dateRange[1]?.format('MM/DD') || 'now'})` : 
+          ' (all data)';
+        toast.success(`CSV exported: ${formName}${dateInfo}`);
       }
     } catch (error) {
       console.error('Export error:', error);
-      message.error('Failed to export data');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to export data';
+      if (errorMessage.includes('permission') || errorMessage.includes('Permission')) {
+        toast.warning('You do not have permission to export data');
+      } else {
+        message.error(errorMessage);
+      }
     }
-  }, [selectedForm, dateRange, formOptions]);
+  }, [selectedForm, dateRange, formOptions, exportCSV]);
 
+
+  // Check if WordPress globals are available
+  if (!window.cf7dba_ajax) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Plugin Configuration Error</h2>
+        <p>The WordPress AJAX configuration is not available. Please ensure the plugin is properly activated.</p>
+        <p>If this issue persists, please contact the plugin developer.</p>
+        <div style={{ marginTop: '20px', textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '4px' }}>
+          <h4>Debug Information:</h4>
+          <p><strong>Window object:</strong> {typeof window}</p>
+          <p><strong>cf7dba_ajax:</strong> {window.cf7dba_ajax ? 'Available' : 'Not available'}</p>
+          <p><strong>Current URL:</strong> {window.location.href}</p>
+          <p><strong>User Agent:</strong> {navigator.userAgent}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Layout className="cf7db-layout">
@@ -466,6 +360,7 @@ const ContactForm7Database: React.FC = () => {
             Contact Form 7 Database
           </h1>
           
+          
           {/* Controls */}
           <div style={headerStyles.controls}>
           {/* Form Selector */}
@@ -473,6 +368,9 @@ const ContactForm7Database: React.FC = () => {
             value={selectedForm}
             onChange={(value) => {
               setSelectedForm(value);
+              setPagination(prev => ({ ...prev, current: 1 }));
+              setSearchQuery('');
+              setDateRange(null);
             }}
             style={headerStyles.formSelect}
             placeholder={forms.length === 0 ? "No forms available" : "Choose Form"}
@@ -683,16 +581,19 @@ const ContactForm7Database: React.FC = () => {
             </div>
           ) : (
             <SubmissionsTable
+              key={selectedForm} // Force re-render when form changes
               submissions={submissions}
-              loading={loading || fieldsLoading}
+              loading={submissionsLoading || fieldsLoading}
               pagination={pagination}
               formFields={formFields}
               onPaginationChange={(newPagination) => {
                 setPagination(newPagination);
                 // Data will be fetched automatically via useEffect
               }}
-              onRefresh={fetchSubmissions}
+              onRefresh={loadSubmissions}
               formId={selectedForm}
+              tableSettings={tableSettings}
+              onTableSettingsChange={setTableSettings}
             />
           )}
         </div>

@@ -71,6 +71,7 @@ export interface ColumnSettings {
 
 // Window interface extensions
 declare global {
+  // eslint-disable-next-line no-unused-vars
   interface Window {
     cf7dba_ajax?: {
       ajax_url: string;

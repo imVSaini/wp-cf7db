@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, List, Switch, Button } from 'antd';
 import { DragOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { ColumnSetting } from '../types';
+import { ColumnSetting } from '../../types';
 
 interface ColumnSettingsModalProps {
   visible: boolean;

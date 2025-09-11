@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Modal, Typography, Row, Col, Divider, Space, Button } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Submission, ColumnConfig } from '../types';
-import { DeleteConfirmationModal, toast } from './shared';
+import { Submission, ColumnConfig } from '../../types';
+import { DeleteConfirmationModal, toast } from '../ui/shared';
 
 const { Text: TypographyText } = Typography;
 
