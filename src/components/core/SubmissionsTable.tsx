@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Table, Button, Space, Pagination, Select, Typography, Row, Col, message, ConfigProvider } from 'antd';
-import { SettingOutlined, PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined, ColumnHeightOutlined } from '@ant-design/icons';
+import { SettingOutlined, EditOutlined, EyeOutlined, DeleteOutlined, ColumnHeightOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { Submission, PaginationType, FormField, ColumnConfig, TableSettings } from '../../types';
 import ColumnSettingsModal from '../modals/ColumnSettingsModal';
 import TableSettingsModal from '../modals/TableSettingsModal';
@@ -629,6 +629,15 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
     // Get form data
     const formData = record.form_data || {};
     
+    // Filter columns based on column configuration
+    const visibleColumns = columns.filter(col => col.visible);
+    
+    // Get metadata columns that are visible
+    const metadataColumns = visibleColumns.filter(col => col.isMetadata);
+    
+    // Get form field columns that are visible
+    const formFieldColumns = visibleColumns.filter(col => !col.isMetadata && col.key !== 'id');
+    
     return (
     <div style={expandedRowStyles.container}>
         {/* Submission Metadata */}
@@ -637,32 +646,30 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
         </TypographyText>
         
         <div style={expandedRowStyles.metadataGrid}>
-          <div style={expandedRowStyles.metadataItem}>
-            <span style={expandedRowStyles.metadataLabel}>ID</span>
-            <div style={expandedRowStyles.metadataValue}>{record.id}</div>
-          </div>
-          
-          <div style={expandedRowStyles.metadataItem}>
-            <span style={expandedRowStyles.metadataLabel}>Form ID</span>
-            <div style={expandedRowStyles.metadataValue}>{record.form_id || '-'}</div>
-          </div>
-          
-          <div style={expandedRowStyles.metadataItem}>
-            <span style={expandedRowStyles.metadataLabel}>Submit IP</span>
-            <div style={expandedRowStyles.metadataValue}>{record.submit_ip || '-'}</div>
-          </div>
-          
-          <div style={expandedRowStyles.metadataItem}>
-            <span style={expandedRowStyles.metadataLabel}>User ID</span>
-            <div style={expandedRowStyles.metadataValue}>{record.submit_user_id || '-'}</div>
-          </div>
-          
-          <div style={expandedRowStyles.metadataItem}>
-            <span style={expandedRowStyles.metadataLabel}>Submit Time</span>
-            <div style={expandedRowStyles.metadataValue}>
-              {record.submit_datetime ? new Date(record.submit_datetime).toLocaleString() : '-'}
-            </div>
-          </div>
+          {metadataColumns.map(col => {
+            let value = '-';
+            const label = col.title;
+            
+            // Get value based on column key
+            if (col.key === 'id') {
+              value = String(record.id);
+            } else if (col.key === 'submit_ip') {
+              value = record.submit_ip || '-';
+            } else if (col.key === 'submit_user_id') {
+              value = record.submit_user_id || '-';
+            } else if (col.key === 'submit_datetime') {
+              value = record.submit_datetime ? new Date(record.submit_datetime).toLocaleString() : '-';
+            } else if (col.key === 'form_id') {
+              value = record.form_id || '-';
+            }
+            
+            return (
+              <div key={col.key} style={expandedRowStyles.metadataItem}>
+                <span style={expandedRowStyles.metadataLabel}>{label}</span>
+                <div style={expandedRowStyles.metadataValue}>{value}</div>
+              </div>
+            );
+          })}
         </div>
         
         {/* Form Data Fields */}
@@ -673,16 +680,38 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
             </TypographyText>
             
             <div style={expandedRowStyles.formDataGrid}>
-              {Object.entries(formData).map(([key, value]) => (
-                <div key={key} style={expandedRowStyles.formDataItem}>
-                  <span style={expandedRowStyles.formDataLabel}>
-                    {key.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </span>
-                  <div style={expandedRowStyles.formDataValue}>
-                    {Array.isArray(value) ? value.join(', ') : String(value || '-')}
+              {Object.entries(formData).map(([key, value]) => {
+                // Check if this field should be shown based on column configuration
+                const shouldShow = formFieldColumns.some(col => {
+                  // Direct match
+                  if (col.key === key) return true;
+                  
+                  // Try alternative field name variations
+                  const alternativeKeys = [
+                    col.key,
+                    col.key.replace(/-/g, '_'),
+                    col.key.replace(/_/g, '-'),
+                    col.key.toLowerCase(),
+                    col.key.toUpperCase()
+                  ];
+                  
+                  return alternativeKeys.includes(key);
+                });
+                
+                // Only show if it should be displayed based on column config
+                if (!shouldShow) return null;
+                
+                return (
+                  <div key={key} style={expandedRowStyles.formDataItem}>
+                    <span style={expandedRowStyles.formDataLabel}>
+                      {key.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </span>
+                    <div style={expandedRowStyles.formDataValue}>
+                      {Array.isArray(value) ? value.join(', ') : String(value || '-')}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
@@ -719,7 +748,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
         </div>
     </div>
   );
-  }, [expandedRowStyles, handleEdit, handleView, handleDelete]);
+  }, [expandedRowStyles, handleEdit, handleView, handleDelete, columns]);
 
   // Memoized expanded row keys array
   const expandedRowKeysArray = useMemo(() => Array.from(expandedRows), [expandedRows]);
@@ -815,9 +844,17 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
           expandIcon: ({ expanded, onExpand, record }) => (
             <Button
               type="text"
-              icon={expanded ? '-' : <PlusOutlined />}
+              icon={expanded ? <MinusOutlined /> : <PlusOutlined />}
               onClick={(e) => onExpand(record, e)}
               size="small"
+              style={{
+                color: '#8C8C8C',
+                border: 'none',
+                boxShadow: 'none',
+                padding: '6px',
+                height: 'auto',
+                minWidth: 'auto'
+              }}
             />
           )
         } : undefined}

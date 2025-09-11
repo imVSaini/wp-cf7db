@@ -56,12 +56,35 @@ class Export_Manager {
 			
 			// Create basic column config from extracted fields
 			$column_config = array();
+			
+			// Add metadata fields first with proper default visibility
+			$metadata_fields = array(
+				'id' => array('title' => 'ID', 'visible' => true),
+				'form_id' => array('title' => 'Form ID', 'visible' => false), 
+				'form_title' => array('title' => 'Form Title', 'visible' => false),
+				'submit_ip' => array('title' => 'Submit IP', 'visible' => false),
+				'submit_datetime' => array('title' => 'Submit Time', 'visible' => true),
+				'submit_user_id' => array('title' => 'User ID', 'visible' => false)
+			);
+			
+			foreach ( $metadata_fields as $key => $config ) {
+				$column_config[] = array(
+					'key' => $key,
+					'title' => $config['title'],
+					'visible' => $config['visible'],
+					'order' => count( $column_config ),
+					'isMetadata' => true
+				);
+			}
+			
+			// Add form data fields
 			foreach ( $all_fields as $field ) {
 				$column_config[] = array(
 					'key' => $field,
 					'title' => ucwords( str_replace( array( '_', '-' ), ' ', $field ) ),
 					'visible' => true,
-					'order' => count( $column_config )
+					'order' => count( $column_config ),
+					'isMetadata' => false
 				);
 			}
 		}

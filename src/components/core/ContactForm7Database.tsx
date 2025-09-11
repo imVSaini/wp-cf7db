@@ -540,7 +540,12 @@ const ContactForm7Database: React.FC = () => {
             <Button
               type={viewMode === 'list' ? 'primary' : 'default'}
               icon={<UnorderedListOutlined />}
-              onClick={() => setViewMode('list')}
+              onClick={() => {
+                if (viewMode !== 'list') {
+                  toast.info('View Mode Switching functionality coming soon');
+                }
+                setViewMode('list');
+              }}
               style={{ 
                 width: '40px',
                 height: '40px',
@@ -553,7 +558,12 @@ const ContactForm7Database: React.FC = () => {
             <Button
               type={viewMode === 'grid' ? 'primary' : 'default'}
               icon={<AppstoreOutlined />}
-              onClick={() => setViewMode('grid')}
+              onClick={() => {
+                if (viewMode !== 'grid') {
+                  toast.info('View Mode Switching functionality coming soon');
+                }
+                setViewMode('grid');
+              }}
               style={{ 
                 width: '40px',
                 height: '40px',

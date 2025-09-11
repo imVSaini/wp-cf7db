@@ -14,11 +14,11 @@ export default defineConfig({
       output: {
         format: 'iife',
         name: 'CF7DB',
-        entryFileNames: 'js/[name].js',
-        chunkFileNames: 'js/[name].js',
+        entryFileNames: 'js/leadsync-[name].js',
+        chunkFileNames: 'js/leadsync-[name].js',
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-            return 'css/[name].css'
+          if (assetInfo.names && assetInfo.names[0] && assetInfo.names[0].endsWith('.css')) {
+            return 'css/leadsync-admin.css'
           }
           return 'assets/[name].[ext]'
         }

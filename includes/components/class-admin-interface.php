@@ -86,22 +86,22 @@ class Admin_Interface {
 
 		// Enqueue built assets
 		wp_enqueue_script(
-			'cf7dba-admin',
-			CF7DBA_PLUGIN_URL . 'build/js/admin.js',
+			'leadsync-admin',
+			CF7DBA_PLUGIN_URL . 'build/js/leadsync-admin.js',
 			array(),
 			CF7DBA_VERSION,
 			true
 		);
 
 		wp_enqueue_style(
-			'cf7dba-admin',
-			CF7DBA_PLUGIN_URL . 'build/css/style.css',
+			'leadsync-admin',
+			CF7DBA_PLUGIN_URL . 'build/css/leadsync-admin.css',
 			array(),
 			CF7DBA_VERSION
 		);
 
 		// Localize script with AJAX data
-		wp_localize_script( 'cf7dba-admin', 'cf7dba_ajax', array(
+		wp_localize_script( 'leadsync-admin', 'cf7dba_ajax', array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'cf7dba_nonce' ),
 			'rest_url' => rest_url( 'cf7dba/v1/' ),

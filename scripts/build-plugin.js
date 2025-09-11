@@ -67,11 +67,9 @@ function validatePluginStructure() {
     'contact-form-7-database.php',
     'includes/class-activator.php',
     'includes/class-database.php',
-    'includes/class-admin.php',
-    'includes/class-exporter.php',
     'includes/class-cf7-hooks.php',
-    'build/js/admin.js',
-    'build/css/style.css'
+    'build/js/leadsync-admin.js',
+    'build/css/leadsync-admin.css'
   ];
   
   const missingFiles = [];
@@ -94,8 +92,6 @@ function validatePluginStructure() {
   const phpFiles = [
     'includes/class-activator.php',
     'includes/class-database.php', 
-    'includes/class-admin.php',
-    'includes/class-exporter.php',
     'includes/class-cf7-hooks.php'
   ];
   
@@ -110,7 +106,7 @@ function validatePluginStructure() {
   console.log('✅ PHP classes have correct namespace');
   
   // Validate React build files
-  const buildFiles = ['build/js/admin.js', 'build/css/style.css'];
+  const buildFiles = ['build/js/leadsync-admin.js', 'build/css/leadsync-admin.css'];
   for (const file of buildFiles) {
     const stats = fs.statSync(file);
     if (stats.size === 0) {
