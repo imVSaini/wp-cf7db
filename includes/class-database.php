@@ -112,9 +112,9 @@ class Database {
 		}
 		$sql .= ' ORDER BY submit_datetime DESC';
 
-		// Debug logging for SQL query
-		error_log( 'CF7DBA: SQL Query: ' . $sql );
-		error_log( 'CF7DBA: Query Parameters: ' . print_r( $params, true ) );
+		// Debug logging for SQL query (disabled in production)
+		// error_log( 'CF7DBA: SQL Query: ' . $sql );
+		// error_log( 'CF7DBA: Query Parameters: ' . print_r( $params, true ) );
 
 		// Get total count for pagination
 		$count_sql = 'SELECT COUNT(*) FROM ' . $this->submissions_table;
@@ -137,8 +137,8 @@ class Database {
 
 		$submissions = array_map( function( $row ) {
 			$row['form_data'] = $row['form_data'] ? json_decode( $row['form_data'], true ) : array();
-			// Debug logging
-			error_log( 'CF7DBA: Submission data for ID ' . $row['id'] . ': ' . print_r( $row, true ) );
+			// Debug logging (disabled in production)
+			// error_log( 'CF7DBA: Submission data for ID ' . $row['id'] . ': ' . print_r( $row, true ) );
 			return $row;
 		}, $rows );
 
@@ -214,17 +214,17 @@ class Database {
 	 */
 	public function delete_submission( $submission_id ) {
 		// Debug logging
-		error_log( 'CF7DBA: Database delete - ID: ' . $submission_id );
-		error_log( 'CF7DBA: Table: ' . $this->submissions_table );
+		// error_log( 'CF7DBA: Database delete - ID: ' . $submission_id );
+		// error_log( 'CF7DBA: Table: ' . $this->submissions_table );
 		
 		$deleted = $this->wpdb->delete(
 			$this->submissions_table,
 			array( 'id' => (int) $submission_id ),
 			array( '%d' )
 		);
-
-		error_log( 'CF7DBA: Database delete result: ' . ( $deleted ? 'SUCCESS' : 'FAILED' ) );
-		error_log( 'CF7DBA: Last error: ' . $this->wpdb->last_error );
+		
+		// error_log( 'CF7DBA: Database delete result: ' . ( $deleted ? 'SUCCESS' : 'FAILED' ) );
+		// error_log( 'CF7DBA: Last error: ' . $this->wpdb->last_error );
 
 		return (bool) $deleted;
 	}
@@ -321,13 +321,13 @@ class Database {
 		$fields = array();
 
 		// Log the form content for debugging
-		error_log( 'CF7DBA: Parsing form content: ' . $form_content );
+		// error_log( 'CF7DBA: Parsing form content: ' . $form_content );
 
 		// More comprehensive pattern to match CF7 field syntax
 		// Matches: [text your-name], [email* your-email], [textarea your-message], etc.
 		preg_match_all( '/\[([a-z*]+)\s+([a-zA-Z_][a-zA-Z0-9_-]*)/', $form_content, $matches );
 
-		error_log( 'CF7DBA: Found ' . count( $matches[0] ) . ' field matches' );
+		// error_log( 'CF7DBA: Found ' . count( $matches[0] ) . ' field matches' );
 
 		foreach ( $matches[0] as $index => $full_match ) {
 			$field_type = $matches[1][$index];
@@ -348,7 +348,7 @@ class Database {
 			);
 
 			$fields[] = $field_data;
-			error_log( 'CF7DBA: Added field: ' . print_r( $field_data, true ) );
+			// error_log( 'CF7DBA: Added field: ' . print_r( $field_data, true ) );
 		}
 
 		// If no fields found with the main pattern, try alternative patterns
@@ -375,11 +375,11 @@ class Database {
 				);
 
 				$fields[] = $field_data;
-				error_log( 'CF7DBA: Added field (alt pattern): ' . print_r( $field_data, true ) );
+				// error_log( 'CF7DBA: Added field (alt pattern): ' . print_r( $field_data, true ) );
 			}
 		}
 
-		error_log( 'CF7DBA: Total fields found: ' . count( $fields ) );
+		// error_log( 'CF7DBA: Total fields found: ' . count( $fields ) );
 		return $fields;
 	}
 

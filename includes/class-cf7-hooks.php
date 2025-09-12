@@ -44,7 +44,7 @@ class CF7_Hooks {
 	 * @param mixed $contact_form
 	 */
 	public function save_submission( $contact_form ) {
-		error_log( 'CF7DBA: wpcf7_mail_sent hook triggered for form ' . $contact_form->id() );
+		// error_log( 'CF7DBA: wpcf7_mail_sent hook triggered for form ' . $contact_form->id() );
 		$this->process_submission( $contact_form );
 	}
 
@@ -54,7 +54,7 @@ class CF7_Hooks {
 	 * @param mixed $contact_form
 	 */
 	public function save_submission_before_mail( $contact_form ) {
-		error_log( 'CF7DBA: wpcf7_before_send_mail hook triggered for form ' . $contact_form->id() );
+		// error_log( 'CF7DBA: wpcf7_before_send_mail hook triggered for form ' . $contact_form->id() );
 		$submission = \WPCF7_Submission::get_instance();
 		if ( $submission ) {
 			// Save regardless of mail status for better data capture
@@ -68,7 +68,7 @@ class CF7_Hooks {
 	 * @param mixed $contact_form
 	 */
 	public function save_submission_on_submit( $contact_form ) {
-		error_log( 'CF7DBA: wpcf7_submit hook triggered for form ' . $contact_form->id() );
+		// error_log( 'CF7DBA: wpcf7_submit hook triggered for form ' . $contact_form->id() );
 		$submission = \WPCF7_Submission::get_instance();
 		if ( $submission && $submission->get_status() !== 'validation_failed' ) {
 			$this->process_submission( $contact_form );
@@ -111,8 +111,8 @@ class CF7_Hooks {
 		$form_data = $this->filter_form_data( $posted_data );
 
 		// Debug logging
-		error_log( 'CF7DBA: Posted data: ' . print_r( $posted_data, true ) );
-		error_log( 'CF7DBA: Filtered form data: ' . print_r( $form_data, true ) );
+		// error_log( 'CF7DBA: Posted data: ' . print_r( $posted_data, true ) );
+		// error_log( 'CF7DBA: Filtered form data: ' . print_r( $form_data, true ) );
 
 		// Prepare submission data
 		$submission_data = array(
@@ -126,9 +126,9 @@ class CF7_Hooks {
 
 		// Log if save failed
 		if ( $submission_id === false ) {
-			error_log( 'CF7DBA: Failed to save submission for form ' . $form_id );
+			// error_log( 'CF7DBA: Failed to save submission for form ' . $form_id );
 		} else {
-			error_log( 'CF7DBA: Successfully saved submission with ID ' . $submission_id );
+			// error_log( 'CF7DBA: Successfully saved submission with ID ' . $submission_id );
 		}
 	}
 

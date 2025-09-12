@@ -72,7 +72,7 @@ class Submission_Manager {
 
 		// Log if save failed
 		if ( $submission_id === false ) {
-			error_log( 'CF7DBA: Failed to save submission for form ' . $form_id );
+			// error_log( 'CF7DBA: Failed to save submission for form ' . $form_id );
 		}
 	}
 
