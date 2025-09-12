@@ -297,12 +297,26 @@ Yes! The admin interface is fully responsive and works perfectly on all devices 
 
 == Screenshots ==
 
-1. Modern admin interface with submission management
-2. Dynamic column management system
-3. Advanced filtering and search capabilities
-4. CSV export with custom column configuration
-5. CFDB7 migration wizard
-6. Responsive mobile interface
+1. **Modern Admin Dashboard** - Clean, intuitive interface showing all form submissions with advanced filtering options
+2. **Dynamic Column Management** - Drag-and-drop column reordering, show/hide controls, and custom title settings
+3. **Advanced Search & Filtering** - Powerful search functionality with date range filters and form-specific views
+4. **CSV Export System** - Export submissions with custom column configuration and filtering options applied
+5. **CFDB7 Migration Wizard** - Seamless migration from Contact Form CFDB7 with data backup and cleanup options
+6. **Responsive Mobile Interface** - Fully responsive design that works perfectly on all devices and screen sizes
+7. **Submission Detail View** - Detailed view of individual form submissions with all field data
+8. **Settings & Configuration** - Comprehensive settings panel for user permissions and plugin configuration
+
+== Banner ==
+
+The plugin banner showcases LeadSync's modern interface with:
+- Clean, professional design
+- Form submission data table
+- Column management controls
+- Export and filtering options
+- Mobile-responsive layout
+- Contact Form 7 integration
+
+Banner dimensions: 1544x500px (WordPress.org standard)
 
 == Changelog ==
 
