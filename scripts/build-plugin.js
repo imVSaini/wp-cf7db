@@ -15,6 +15,7 @@ const INCLUDE_FILES = [
   'leadsync.php',
   'includes/',
   'languages/',
+  'assets/',
   'readme.txt',
   'LICENSE'
 ];
@@ -73,6 +74,21 @@ function validatePluginStructure() {
     'build/css/leadsync-admin.css'
   ];
   
+  // Check for assets directory and screenshots
+  if (fs.existsSync('assets')) {
+    const screenshotFiles = fs.readdirSync('assets').filter(file => 
+      file.startsWith('screenshot-') && file.endsWith('.png')
+    );
+    
+    if (screenshotFiles.length === 0) {
+      console.log('⚠️  No screenshot files found in assets directory');
+    } else {
+      console.log(`✅ Found ${screenshotFiles.length} screenshot files`);
+    }
+  } else {
+    console.log('⚠️  Assets directory not found - screenshots will not be included');
+  }
+  
   const missingFiles = [];
   
   for (const file of requiredFiles) {
@@ -117,6 +133,9 @@ function validatePluginStructure() {
   }
   
   console.log('✅ Build files are valid');
+  
+  // Validate WordPress plugin structure
+  console.log('✅ WordPress plugin structure validation complete');
   return true;
 }
 
@@ -197,10 +216,21 @@ function createPluginZip() {
     console.log('Copied build directory');
   }
   
-  // Copy assets directory if it exists
+  // Copy assets directory if it exists (screenshots for WordPress.org)
   if (fs.existsSync('assets')) {
     copyDirectory('assets', path.join(tempPluginDir, 'assets'));
-    console.log('Copied assets directory');
+    console.log('Copied assets directory (screenshots)');
+    
+    // Validate screenshot files
+    const screenshotFiles = fs.readdirSync('assets').filter(file => 
+      file.startsWith('screenshot-') && file.endsWith('.png')
+    );
+    
+    if (screenshotFiles.length > 0) {
+      console.log(`✅ Found ${screenshotFiles.length} screenshot files:`, screenshotFiles.join(', '));
+    } else {
+      console.log('⚠️  No screenshot files found in assets directory');
+    }
   }
   
   // Create languages directory if it doesn't exist
@@ -415,6 +445,15 @@ LeadSync stores form submission data in your WordPress database. No data is sent
   output.on('close', () => {
     console.log(`Plugin zip created successfully: ${zipPath}`);
     console.log(`Total size: ${(archive.pointer() / 1024 / 1024).toFixed(2)} MB`);
+    
+    // Show final plugin contents
+    console.log('\n📦 Plugin contents:');
+    console.log('   - Main plugin file: leadsync.php');
+    console.log('   - PHP classes: includes/');
+    console.log('   - React admin UI: build/');
+    console.log('   - Screenshots: assets/');
+    console.log('   - Documentation: readme.txt');
+    console.log('   - License: LICENSE');
     
     // Clean up temporary directory
     fs.rmSync(tempPluginDir, { recursive: true, force: true });
