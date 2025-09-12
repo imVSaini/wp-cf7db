@@ -1,0 +1,157 @@
+<svg width="1544" height="500" viewBox="0 0 1544 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E293B;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#334155;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#475569;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#F8FAFC;stop-opacity:0.95" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1544" height="500" fill="url(#bgGradient)"/>
+  
+  <!-- Subtle Background Pattern -->
+  <g opacity="0.05">
+    <circle cx="200" cy="100" r="2" fill="white"/>
+    <circle cx="400" cy="150" r="1.5" fill="white"/>
+    <circle cx="600" cy="80" r="2" fill="white"/>
+    <circle cx="800" cy="120" r="1.5" fill="white"/>
+    <circle cx="1000" cy="200" r="2" fill="white"/>
+    <circle cx="1200" cy="90" r="1.5" fill="white"/>
+    <circle cx="1400" cy="160" r="2" fill="white"/>
+  </g>
+  
+  <!-- Main Content Card -->
+  <rect x="50" y="50" width="1444" height="400" rx="20" fill="url(#cardGradient)" stroke="#E2E8F0" stroke-width="2"/>
+  
+  <!-- Left Side - Logo and Title -->
+  <g transform="translate(100, 100)">
+    <!-- Logo Circle -->
+    <circle cx="80" cy="80" r="60" fill="url(#accentGradient)"/>
+    
+    <!-- Database Icon in Logo -->
+    <g transform="translate(40, 40)">
+      <ellipse cx="40" cy="15" rx="30" ry="8" fill="white" opacity="0.9"/>
+      <rect x="10" y="15" width="60" height="50" fill="white" opacity="0.8"/>
+      <ellipse cx="40" cy="65" rx="30" ry="8" fill="white" opacity="0.9"/>
+      
+      <!-- Database Lines -->
+      <line x1="15" y1="25" x2="65" y2="25" stroke="#4F46E5" stroke-width="2" opacity="0.6"/>
+      <line x1="15" y1="35" x2="65" y2="35" stroke="#4F46E5" stroke-width="2" opacity="0.6"/>
+      <line x1="15" y1="45" x2="65" y2="45" stroke="#4F46E5" stroke-width="2" opacity="0.6"/>
+      <line x1="15" y1="55" x2="65" y2="55" stroke="#4F46E5" stroke-width="2" opacity="0.6"/>
+    </g>
+    
+    <!-- Check Mark Icon -->
+    <g transform="translate(120, 40)">
+      <circle cx="0" cy="0" r="15" fill="#10B981"/>
+      <path d="M-4,-2 L-1,1 L4,-4" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+  </g>
+  
+  <!-- Title and Subtitle -->
+  <text x="300" y="150" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#1E293B">LeadSync</text>
+  <text x="300" y="190" font-family="Arial, sans-serif" font-size="24" fill="#64748B">Contact Form 7 Database Management</text>
+  
+  <!-- Feature List -->
+  <g transform="translate(300, 220)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="16" fill="#4F46E5" font-weight="bold">✓ Multi-step Form Support</text>
+    <text x="0" y="25" font-family="Arial, sans-serif" font-size="16" fill="#4F46E5" font-weight="bold">✓ Dynamic Column Management</text>
+    <text x="0" y="50" font-family="Arial, sans-serif" font-size="16" fill="#4F46E5" font-weight="bold">✓ Advanced Filtering &amp; Export</text>
+    <text x="0" y="75" font-family="Arial, sans-serif" font-size="16" fill="#4F46E5" font-weight="bold">✓ CFDB7 Migration Tools</text>
+  </g>
+  
+  <!-- Right Side - Mockup Interface -->
+  <g transform="translate(800, 80)">
+    <!-- Browser Window -->
+    <rect x="0" y="0" width="580" height="300" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2"/>
+    
+    <!-- Browser Header -->
+    <rect x="0" y="0" width="580" height="35" rx="8" fill="#F3F4F6"/>
+    <circle cx="18" cy="17" r="5" fill="#EF4444"/>
+    <circle cx="35" cy="17" r="5" fill="#F59E0B"/>
+    <circle cx="52" cy="17" r="5" fill="#10B981"/>
+    
+    <!-- Title Bar -->
+    <text x="70" y="22" font-family="Arial, sans-serif" font-size="13" font-weight="500" fill="#374151">LeadSync - Form Submissions</text>
+    
+    <!-- Main Content Card -->
+    <rect x="15" y="45" width="550" height="240" rx="6" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+    
+    <!-- Table Header -->
+    <rect x="15" y="45" width="550" height="32" fill="#4F46E5"/>
+    <text x="25" y="63" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="white">ID</text>
+    <text x="70" y="63" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="white">Name</text>
+    <text x="180" y="63" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="white">Email</text>
+    <text x="320" y="63" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="white">Form</text>
+    <text x="420" y="63" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="white">Date</text>
+    <text x="500" y="63" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="white">Actions</text>
+    
+    <!-- Table Rows -->
+    <rect x="15" y="77" width="550" height="24" fill="white"/>
+    <text x="25" y="92" font-family="Arial, sans-serif" font-size="10" fill="#374151">#1</text>
+    <text x="70" y="92" font-family="Arial, sans-serif" font-size="10" fill="#374151">John Doe</text>
+    <text x="180" y="92" font-family="Arial, sans-serif" font-size="10" fill="#374151">john@example.com</text>
+    <text x="320" y="92" font-family="Arial, sans-serif" font-size="10" fill="#374151">Contact</text>
+    <text x="420" y="92" font-family="Arial, sans-serif" font-size="10" fill="#374151">2024-01-15</text>
+    <text x="500" y="92" font-family="Arial, sans-serif" font-size="10" fill="#4F46E5" font-weight="500">View</text>
+    
+    <rect x="15" y="101" width="550" height="24" fill="#F9FAFB"/>
+    <text x="25" y="116" font-family="Arial, sans-serif" font-size="10" fill="#374151">#2</text>
+    <text x="70" y="116" font-family="Arial, sans-serif" font-size="10" fill="#374151">Jane Smith</text>
+    <text x="180" y="116" font-family="Arial, sans-serif" font-size="10" fill="#374151">jane@example.com</text>
+    <text x="320" y="116" font-family="Arial, sans-serif" font-size="10" fill="#374151">Newsletter</text>
+    <text x="420" y="116" font-family="Arial, sans-serif" font-size="10" fill="#374151">2024-01-14</text>
+    <text x="500" y="116" font-family="Arial, sans-serif" font-size="10" fill="#4F46E5" font-weight="500">View</text>
+    
+    <rect x="15" y="125" width="550" height="24" fill="white"/>
+    <text x="25" y="140" font-family="Arial, sans-serif" font-size="10" fill="#374151">#3</text>
+    <text x="70" y="140" font-family="Arial, sans-serif" font-size="10" fill="#374151">Bob Johnson</text>
+    <text x="180" y="140" font-family="Arial, sans-serif" font-size="10" fill="#374151">bob@example.com</text>
+    <text x="320" y="140" font-family="Arial, sans-serif" font-size="10" fill="#374151">Support</text>
+    <text x="420" y="140" font-family="Arial, sans-serif" font-size="10" fill="#374151">2024-01-13</text>
+    <text x="500" y="140" font-family="Arial, sans-serif" font-size="10" fill="#4F46E5" font-weight="500">View</text>
+    
+    <!-- Action Buttons -->
+    <rect x="15" y="160" width="75" height="30" rx="6" fill="#10B981"/>
+    <text x="47" y="178" font-family="Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle" fill="white">Export CSV</text>
+    
+    <rect x="100" y="160" width="65" height="30" rx="6" fill="#4F46E5"/>
+    <text x="127" y="178" font-family="Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle" fill="white">Filter</text>
+    
+    <rect x="175" y="160" width="75" height="30" rx="6" fill="#4F46E5"/>
+    <text x="207" y="178" font-family="Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle" fill="white">Settings</text>
+    
+    <!-- Search Bar -->
+    <rect x="15" y="200" width="280" height="32" rx="6" fill="white" stroke="#D1D5DB" stroke-width="1"/>
+    <text x="25" y="218" font-family="Arial, sans-serif" font-size="11" fill="#9CA3AF">Search submissions...</text>
+    
+    <!-- Pagination -->
+    <g transform="translate(400, 200)">
+      <rect x="0" y="0" width="30" height="32" rx="6" fill="#F3F4F6"/>
+      <text x="15" y="20" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#6B7280">‹</text>
+      <rect x="35" y="0" width="30" height="32" rx="6" fill="#4F46E5"/>
+      <text x="50" y="20" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white" font-weight="600">1</text>
+      <rect x="70" y="0" width="30" height="32" rx="6" fill="#F3F4F6"/>
+      <text x="85" y="20" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#6B7280">2</text>
+      <rect x="105" y="0" width="30" height="32" rx="6" fill="#F3F4F6"/>
+      <text x="120" y="20" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#6B7280">3</text>
+      <rect x="140" y="0" width="30" height="32" rx="6" fill="#F3F4F6"/>
+      <text x="155" y="20" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#6B7280">›</text>
+    </g>
+  </g>
+  
+  <!-- Bottom Text -->
+  <g transform="translate(100, 420)">
+    <rect x="0" y="0" width="1344" height="60" fill="#F8FAFC" rx="8"/>
+    <text x="672" y="35" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#374151">Modern Admin Interface • Advanced Filtering • CSV Export • CFDB7 Migration</text>
+  </g>
+</svg>

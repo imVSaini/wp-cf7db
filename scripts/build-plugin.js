@@ -20,6 +20,13 @@ const INCLUDE_FILES = [
   'LICENSE'
 ];
 
+// WordPress.org required assets
+const WORDPRESS_ASSETS = {
+  banner: 'assets/banner-1544x500.png',
+  icon: 'assets/icon-256x256.png',
+  logo: 'assets/icon-128x128.png'
+};
+
 
 // Files and directories to exclude
 const EXCLUDE_PATTERNS = [
@@ -39,7 +46,8 @@ const EXCLUDE_PATTERNS = [
   'vite.config.ts',
   '.eslintrc.cjs',
   '.gitignore',
-  'README.md'
+  'README.md',
+  '*.svg'
 ];
 
 function createDirectory(dirPath) {
@@ -84,6 +92,16 @@ function validatePluginStructure() {
       console.log('⚠️  No screenshot files found in assets directory');
     } else {
       console.log(`✅ Found ${screenshotFiles.length} screenshot files`);
+    }
+    
+    // Check for WordPress.org required assets
+    console.log('Checking WordPress.org required assets...');
+    for (const [type, path] of Object.entries(WORDPRESS_ASSETS)) {
+      if (fs.existsSync(path)) {
+        console.log(`✅ Found ${type}: ${path}`);
+      } else {
+        console.log(`⚠️  Missing ${type}: ${path}`);
+      }
     }
   } else {
     console.log('⚠️  Assets directory not found - screenshots will not be included');
@@ -240,200 +258,6 @@ function createPluginZip() {
     console.log('Created languages directory');
   }
   
-  // Create readme.txt if it doesn't exist
-  const readmePath = path.join(tempPluginDir, 'readme.txt');
-  if (!fs.existsSync(readmePath)) {
-    const readmeContent = `=== LeadSync ===
-Contributors: vaibhavsaini07
-Plugin URI: https://wordpress.org/plugins/leadsync/
-Tags: contact-form-7, contact-form-7-database, cf7-database, form-submissions, database, submissions, admin, multi-step, export, csv, leadsync, migration, cfdb7
-Requires at least: 5.0
-Tested up to: 6.5
-Requires PHP: 8.0
-Stable tag: ${PLUGIN_VERSION}
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
-
-LeadSync - Save Contact Form 7 submissions (including multi-step) into a custom database table with modern admin UI, column management, and CSV export. Perfect for Contact Form 7 Database management.
-
-== Description ==
-
-LeadSync is the ultimate Contact Form 7 submission management solution that transforms how you handle form data. Whether you're managing simple contact forms or complex multi-step processes, LeadSync provides everything you need to capture, organize, and export your form submissions with professional-grade tools and an intuitive interface.
-
-**🚀 Key Features:**
-
-* **📝 Multi-step Form Support** - Capture submissions from complex multi-step Contact Form 7 forms with complete data integrity
-* **🎛️ Dynamic Column Management** - Drag-and-drop column reordering, show/hide columns, custom titles, and flexible data display
-* **🔍 Advanced Filtering & Search** - Powerful search functionality, date range filtering, form-specific views, and real-time filtering
-* **📊 CSV Export System** - Export submissions with dynamic columns, filtering options, and customizable data formatting
-* **⚡ Modern Admin Interface** - React-based UI with TypeScript for optimal performance and maintainability
-* **🔐 IP Tracking & User Management** - Automatic IP address capture, user ID tracking, and submission metadata
-* **🔄 CFDB7 Migration Tools** - Seamless migration from Contact Form CFDB7 plugin with data backup and cleanup
-* **📱 Responsive Design** - Mobile-friendly interface that works perfectly on all screen sizes
-* **🛡️ Security First** - Built with WordPress security best practices, nonce verification, and input sanitization
-* **⚙️ Professional Architecture** - Clean, maintainable code with proper namespacing and modern development practices
-
-**🎯 Perfect For:**
-* WordPress developers managing multiple Contact Form 7 forms
-* Business owners needing detailed form submission analytics
-* Marketing teams requiring lead management and export capabilities
-* Anyone looking to replace or upgrade from Contact Form CFDB7
-
-**💡 Why Choose LeadSync?**
-* **Complete Form Management** - Handle all your Contact Form 7 submissions in one powerful dashboard
-* **Zero Learning Curve** - Intuitive interface that anyone can use without technical knowledge
-* **Advanced Data Control** - Customize exactly what data you see and how it's displayed
-* **Seamless Migration** - Easy transition from Contact Form CFDB7 with data backup and cleanup
-* **Professional Export Tools** - Export your data exactly how you need it with custom formatting
-
-== Installation ==
-
-1. **Upload Plugin**: Upload the plugin files to the \`/wp-content/plugins/leadsync\` directory, or install the plugin through the WordPress plugins screen directly.
-2. **Activate Plugin**: Activate the plugin through the 'Plugins' screen in WordPress
-3. **Install Contact Form 7**: Ensure Contact Form 7 is installed and active (required dependency)
-4. **Access Admin Interface**: Navigate to 'LeadSync' in the WordPress admin menu to start managing your form submissions
-
-**System Requirements:**
-* WordPress 5.0 or higher
-* PHP 8.0 or higher
-* Contact Form 7 plugin (active)
-* MySQL 5.6 or higher
-
-== Frequently Asked Questions ==
-
-= How does LeadSync differ from Contact Form CFDB7? =
-
-LeadSync offers a modern React-based interface, better performance, advanced filtering, dynamic column management, and seamless migration tools. It's built with modern web technologies and follows WordPress best practices.
-
-= Can I migrate my existing Contact Form CFDB7 data? =
-
-Yes! LeadSync includes comprehensive migration tools to seamlessly transfer your existing CFDB7 data with backup and cleanup options.
-
-= Does LeadSync support multi-step Contact Form 7 forms? =
-
-Absolutely! LeadSync fully supports multi-step Contact Form 7 forms and captures all submission data with complete integrity.
-
-= Can I customize which columns are displayed? =
-
-Yes! LeadSync provides a powerful column management system where you can show/hide columns, reorder them, and set custom titles.
-
-= Is the data exportable? =
-
-Yes! You can export submissions to CSV with your custom column configuration and filtering options applied.
-
-= Is LeadSync mobile-friendly? =
-
-Yes! The admin interface is fully responsive and works perfectly on all devices and screen sizes.
-
-== Screenshots ==
-
-1. **Modern Admin Dashboard** - Clean, intuitive interface showing all form submissions with advanced filtering options
-2. **Dynamic Column Management** - Drag-and-drop column reordering, show/hide controls, and custom title settings
-3. **Advanced Search & Filtering** - Powerful search functionality with date range filters and form-specific views
-4. **CSV Export System** - Export submissions with custom column configuration and filtering options applied
-5. **CFDB7 Migration Wizard** - Seamless migration from Contact Form CFDB7 with data backup and cleanup options
-6. **Responsive Mobile Interface** - Fully responsive design that works perfectly on all devices and screen sizes
-7. **Submission Detail View** - Detailed view of individual form submissions with all field data
-8. **Settings & Configuration** - Comprehensive settings panel for user permissions and plugin configuration
-
-== Banner ==
-
-The plugin banner showcases LeadSync's modern interface with:
-- Clean, professional design
-- Form submission data table
-- Column management controls
-- Export and filtering options
-- Mobile-responsive layout
-- Contact Form 7 integration
-
-Banner dimensions: 1544x500px (WordPress.org standard)
-
-== Changelog ==
-
-= ${PLUGIN_VERSION} =
-* **Initial Release** - Complete LeadSync plugin with all core features
-* **Multi-step Form Support** - Full support for complex Contact Form 7 multi-step forms
-* **Dynamic Column Management** - Drag-and-drop reordering, show/hide, custom titles
-* **React Admin Interface** - Modern TypeScript-based UI with Ant Design components
-* **CSV Export System** - Advanced export with column configuration and filtering
-* **IP Tracking & User Management** - Automatic IP and user ID capture
-* **CFDB7 Migration Tools** - Complete migration system with backup and cleanup
-* **Security Implementation** - WordPress security best practices, nonce verification
-* **Responsive Design** - Mobile-friendly interface for all screen sizes
-* **Professional Architecture** - Clean code structure with CF7DBA namespace
-* **Database Optimization** - Advanced schema with proper indexing and relationships
-* **Auto-hiding Scrollbars** - Enhanced UX with modern scrollbar styling
-
-== Upgrade Notice ==
-
-= ${PLUGIN_VERSION} =
-Initial release of LeadSync with comprehensive Contact Form 7 submission management features. Perfect for upgrading from Contact Form CFDB7 or starting fresh with modern form submission management.
-
-== Support ==
-
-For support, feature requests, or bug reports, please visit the [plugin support forum](https://wordpress.org/support/plugin/leadsync/) or check the [documentation](https://wordpress.org/plugins/leadsync/).
-
-== Development ==
-
-LeadSync is actively developed and maintained. The source code is available on [GitHub](https://github.com/vaibhavsaini07/leadsync) for contributions and development.
-
-**Contributing:**
-* Report bugs and request features
-* Submit pull requests
-* Help with documentation
-* Test new releases
-
-== Privacy Policy ==
-
-LeadSync stores form submission data in your WordPress database. No data is sent to external servers. All data remains under your control and follows your website's privacy policy.
-
-**Data Stored:**
-* Form submission data (as configured)
-* IP addresses (optional)
-* User IDs (if logged in)
-* Submission timestamps
-* Form metadata
-
-**Data Export:**
-* All data can be exported via CSV
-* Data can be migrated to other systems
-* Complete data portability
-
-== What Makes LeadSync Special ==
-
-**🎯 Complete Solution:**
-* Everything you need to manage Contact Form 7 submissions in one plugin
-* No need for multiple tools or complex setups
-* Works with any Contact Form 7 form, simple or complex
-
-**⚡ Performance & Reliability:**
-* Lightning-fast loading and data processing
-* Optimized for high-volume form submissions
-* Reliable data storage with automatic backups
-* Works seamlessly with your existing WordPress site
-
-**🔒 Security & Privacy:**
-* All data stays on your server - no external data sharing
-* WordPress security best practices built-in
-* Complete control over your form submission data
-* GDPR-compliant data handling
-
-**📱 Universal Compatibility:**
-* Works on any device - desktop, tablet, or mobile
-* Compatible with all modern WordPress themes
-* Integrates seamlessly with Contact Form 7
-* No conflicts with other plugins
-
-**System Requirements:**
-* WordPress 5.0 or higher
-* PHP 8.0 or higher
-* Contact Form 7 plugin (active)
-* Any modern web browser
-`;
-    
-    fs.writeFileSync(readmePath, readmeContent);
-    console.log('Created readme.txt');
-  }
   
   // Create zip file
   console.log('Creating plugin zip file...');
@@ -451,7 +275,9 @@ LeadSync stores form submission data in your WordPress database. No data is sent
     console.log('   - Main plugin file: leadsync.php');
     console.log('   - PHP classes: includes/');
     console.log('   - React admin UI: build/');
-    console.log('   - Screenshots: assets/');
+    console.log('   - Screenshots: assets/screenshot-*.png');
+    console.log('   - Plugin banner: assets/banner-1544x500.png');
+    console.log('   - Plugin icons: assets/icon-*.png');
     console.log('   - Documentation: readme.txt');
     console.log('   - License: LICENSE');
     

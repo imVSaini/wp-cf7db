@@ -8,7 +8,7 @@
  * Author URI:        https://www.linkedin.com/in/vaibhavsaini07/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       cf7dba
+ * Text Domain:       leadsync
  * Domain Path:       /languages
  */
 
@@ -59,7 +59,7 @@ register_activation_hook( __FILE__, function () {
 function cf7dba_missing_cf7_notice() {
 	if ( current_user_can( 'activate_plugins' ) ) {
 		$class   = 'notice notice-error';
-		$message = esc_html__( 'LeadSync requires Contact Form 7 to be installed and active.', 'cf7dba' );
+		$message = esc_html__( 'LeadSync requires Contact Form 7 to be installed and active.', 'leadsync' );
 		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), $message );
 	}
 }
@@ -83,5 +83,4 @@ add_action( 'plugins_loaded', function () {
 	$admin_interface = new CF7DBA\Components\Admin_Interface( $form_manager, $submission_manager, $export_manager );
 	$cf7_hooks = new CF7DBA\Components\CF7_Hooks( $submission_manager );
 
-	load_plugin_textdomain( 'cf7dba', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 } );
