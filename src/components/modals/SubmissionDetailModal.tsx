@@ -31,7 +31,7 @@ const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
   const handleEdit = useCallback(() => {
     // Implement edit functionality
     toast.info('Edit functionality coming soon');
-    console.log('Edit submission:', submissionRef.current);
+    // Edit submission functionality
   }, []);
 
   const handleDelete = useCallback(() => {

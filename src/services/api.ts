@@ -241,8 +241,8 @@ class WordPressApiService {
     return response.data;
   }
 
-  async exportCFDB7Backup(): Promise<{ filepath: string }> {
-    const response = await this.post<{ filepath: string }>('cf7dba_export_cfdb7_backup', {});
+  async exportCFDB7Backup(): Promise<{ filepath: string; filename?: string }> {
+    const response = await this.post<{ filepath: string; filename?: string }>('cf7dba_export_cfdb7_backup', {});
     return response.data;
   }
 

@@ -492,12 +492,13 @@ class Admin_Interface {
 			return;
 		}
 
-		$filepath = $this->migration_manager->export_cfdb7_data_to_csv();
+		$result = $this->migration_manager->export_cfdb7_data_to_csv();
 
-		if ( $filepath ) {
+		if ( $result && isset( $result['file_url'] ) ) {
 			wp_send_json_success( array( 
 				'message' => __( 'CFDB7 data exported successfully', 'cf7dba' ),
-				'filepath' => $filepath
+				'filepath' => $result['file_url'],
+				'filename' => $result['filename']
 			) );
 		} else {
 			wp_send_json_error( array( 'message' => __( 'Failed to export CFDB7 data', 'cf7dba' ) ) );

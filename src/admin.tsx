@@ -23,5 +23,5 @@ if (container) {
         </React.StrictMode>
   );
 } else {
-  console.error('CF7DBA: React app container not found! Looking for #cf7db-admin-app');
+  // React app container not found
 }

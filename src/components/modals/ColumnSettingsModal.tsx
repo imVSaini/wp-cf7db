@@ -35,7 +35,7 @@ const ColumnSettingsModal: React.FC<ColumnSettingsModalProps> = ({
 
   const handleSave = () => {
     // Implement save logic
-    console.log('Saving column settings:', columns);
+    // Saving column settings
     onClose();
   };
 

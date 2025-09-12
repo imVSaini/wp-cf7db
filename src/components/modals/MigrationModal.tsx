@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Progress, Alert, Steps, Typography, Space, Divider } from 'antd';
 import { DownloadOutlined, DatabaseOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useApi } from '../../hooks/useApi';
 
-const { Title, Text } = Typography;
+const { Title, Text: TypographyText } = Typography;
 
 interface MigrationStatus {
   cfdb7_exists: boolean;
@@ -38,14 +38,7 @@ const MigrationModal: React.FC<{
   // Use the useApi hook for all API calls
   const { checkMigration, migrateData, exportCFDB7Backup, cleanupCFDB7 } = useApi();
 
-  // Check migration status when modal opens
-  useEffect(() => {
-    if (visible) {
-      checkMigrationStatus();
-    }
-  }, [visible]);
-
-  const checkMigrationStatus = async () => {
+  const checkMigrationStatus = useCallback(async () => {
     try {
       const result = await checkMigration();
       if (result) {
@@ -57,24 +50,37 @@ const MigrationModal: React.FC<{
         }
       }
     } catch (error) {
-      console.error('Failed to check migration status:', error);
+      // Error handling is done in the useApi hook
     }
-  };
+  }, [checkMigration]);
+
+  // Check migration status when modal opens
+  useEffect(() => {
+    if (visible) {
+      checkMigrationStatus();
+    }
+  }, [visible, checkMigrationStatus]);
 
   const handleExportCFDB7Backup = async () => {
     try {
       const result = await exportCFDB7Backup();
-      if (result) {
-        // Create download link
+      if (result && result.filepath) {
+        // Create download link with proper filename from backend
         const link = document.createElement('a');
-        link.href = result.filepath;
-        link.download = `cfdb7-backup-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+        // Add cache-busting parameter to force fresh download
+        const url = new URL(result.filepath);
+        url.searchParams.set('t', Date.now().toString());
+        link.href = url.toString();
+        const filename = result.filename || `cfdb7-backup-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+        link.download = filename;
+        // Force download with proper filename
+        link.setAttribute('download', filename);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       }
     } catch (error) {
-      console.error('Failed to export CFDB7 backup:', error);
+      // Error handling is done in the useApi hook
     }
   };
 
@@ -126,7 +132,7 @@ const MigrationModal: React.FC<{
       await cleanupCFDB7();
       setCurrentStep(4);
     } catch (error) {
-      console.error('Failed to cleanup CFDB7:', error);
+      // Error handling is done in the useApi hook
     }
   };
 
@@ -197,10 +203,10 @@ const MigrationModal: React.FC<{
         {currentStep === 1 && migrationStatus && (
           <div>
             <Title level={4}>Backup CFDB7 Data</Title>
-            <Text>
+            <TypographyText>
               Before migrating, we recommend creating a backup of your CFDB7 data. 
               This ensures you can restore it if needed.
-            </Text>
+            </TypographyText>
             <br /><br />
             <Space>
               <Button 
@@ -220,7 +226,7 @@ const MigrationModal: React.FC<{
         {currentStep === 2 && (
           <div>
             <Title level={4}>Migrating Data</Title>
-            <Text>Transferring submissions from CFDB7 to LeadSync...</Text>
+            <TypographyText>Transferring submissions from CFDB7 to LeadSync...</TypographyText>
             <br /><br />
             <Progress 
               percent={migrationProgress} 
@@ -229,7 +235,7 @@ const MigrationModal: React.FC<{
             />
             {migrationResult && (
               <div style={{ marginTop: 16 }}>
-                <Text>Migrated: {migrationResult.migrated} of {migrationResult.total} submissions</Text>
+                <TypographyText>Migrated: {migrationResult.migrated} of {migrationResult.total} submissions</TypographyText>
               </div>
             )}
           </div>
@@ -247,7 +253,7 @@ const MigrationModal: React.FC<{
             />
             {errors.length > 0 && (
               <div style={{ marginTop: 16 }}>
-                <Text type="danger">Errors encountered:</Text>
+                <TypographyText type="danger">Errors encountered:</TypographyText>
                 <ul>
                   {errors.slice(0, 5).map((error, index) => (
                     <li key={index}>{error}</li>

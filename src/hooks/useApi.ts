@@ -23,7 +23,7 @@ export const useApi = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
-      console.error('API Error:', err);
+      // Error logging handled by error handling system
       return null;
     } finally {
       if (showLoading) {

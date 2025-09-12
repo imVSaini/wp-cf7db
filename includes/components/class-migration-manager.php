@@ -416,7 +416,7 @@ class Migration_Manager {
 	/**
 	 * Export CFDB7 data to CSV for backup
 	 *
-	 * @return string|false
+	 * @return array|false
 	 */
 	public function export_cfdb7_data_to_csv() {
 		$table_exists = $this->wpdb->get_var( "SHOW TABLES LIKE '{$this->cfdb7_table}'" );
@@ -430,7 +430,9 @@ class Migration_Manager {
 		}
 
 		$filename = 'cfdb7-backup-' . date( 'Y-m-d-H-i-s' ) . '.csv';
-		$filepath = WP_CONTENT_DIR . '/uploads/' . $filename;
+		$upload_dir = wp_upload_dir();
+		$filepath = $upload_dir['path'] . '/' . $filename;
+		$file_url = $upload_dir['url'] . '/' . $filename;
 
 		$file = fopen( $filepath, 'w' );
 		if ( ! $file ) {
@@ -447,6 +449,10 @@ class Migration_Manager {
 
 		fclose( $file );
 
-		return $filepath;
+		return array(
+			'filepath' => $filepath,
+			'file_url' => $file_url,
+			'filename' => $filename
+		);
 	}
 }

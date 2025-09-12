@@ -203,7 +203,7 @@ const ContactForm7Database: React.FC = () => {
       toast.success('Settings saved successfully');
       setSettingsVisible(false);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      // Failed to save settings
       message.error('Failed to save settings');
     }
   }, [saveSettings]);
@@ -324,7 +324,7 @@ const ContactForm7Database: React.FC = () => {
         toast.success(`CSV exported: ${formName}${dateInfo}`);
       }
     } catch (error) {
-      console.error('Export error:', error);
+      // Export error
       const errorMessage = error instanceof Error ? error.message : 'Failed to export data';
       if (errorMessage.includes('permission') || errorMessage.includes('Permission')) {
         toast.warning('You do not have permission to export data');

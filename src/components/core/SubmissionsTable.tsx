@@ -58,10 +58,10 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
 
     const columnConfig = await getColumnConfig(formId);
     if (columnConfig && columnConfig.length > 0) {
-      console.log('CF7DBA: Loading column config from database:', columnConfig);
+      // Loading column config from database
       setColumns(columnConfig);
     } else {
-      console.log('CF7DBA: No column config found in database, will use defaults');
+      // No column config found in database, will use defaults
     }
   }, [formId, getColumnConfig]);
 
@@ -73,7 +73,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       await saveColumnConfig(formId, columnConfig);
       message.success('Column configuration saved successfully');
     } catch (error) {
-      console.error('Failed to save column config:', error);
+      // Failed to save column config
       message.error('Failed to save column configuration');
     }
   }, [formId, saveColumnConfig]);
@@ -268,7 +268,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
           message.warning('You do not have permission to delete submissions');
         }
       } else {
-        console.error('Failed to delete submission:', errorMessage);
+        // Failed to delete submission
         if (showToast) {
           message.error(errorMessage);
         }
@@ -282,7 +282,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       setSubmissionDetailVisible(false);
     } catch (error) {
       // Error is already logged in deleteSubmission
-      console.error('Delete operation failed:', error);
+      // Delete operation failed
     }
   }, [deleteSubmission]);
 
@@ -321,7 +321,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             const isPermissionError = errorMessage.includes('permission') || errorMessage.includes('Permission');
-            console.error(`Failed to delete submission ${id}:`, error);
+            // Failed to delete submission
             return { success: false, id, error: errorMessage, isPermissionError };
           }
         }
@@ -369,7 +369,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       }
       // No success message for bulk delete - silent success
     } catch (error) {
-      console.error('Bulk delete failed:', error);
+      // Bulk delete failed
       message.error('Bulk delete operation failed');
     } finally {
       setBulkDeleting(false);
