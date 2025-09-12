@@ -861,7 +861,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
         size={tableSettings.size as any}
         bordered={tableSettings.bordered}
         showHeader={tableSettings.columnHeader}
-        scroll={tableSettings.fixedHeader ? { x: 1000, y: 400 } : { x: 1000 }}
+        scroll={tableSettings.fixedHeader ? { x: 1000, y: 480 } : { x: 1000 }}
         rowSelection={tableSettings.checkbox ? {
           selectedRowKeys,
           onChange: setSelectedRowKeys,
