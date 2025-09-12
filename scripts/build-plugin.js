@@ -12,7 +12,7 @@ const BUILD_DIR = 'build';
 
 // Files and directories to include in the plugin
 const INCLUDE_FILES = [
-  'contact-form-7-database.php',
+  'leadsync.php',
   'includes/',
   'languages/',
   'readme.txt'
@@ -64,7 +64,7 @@ function validatePluginStructure() {
   console.log('Validating plugin structure...');
   
   const requiredFiles = [
-    'contact-form-7-database.php',
+    'leadsync.php',
     'includes/class-activator.php',
     'includes/class-database.php',
     'includes/class-cf7-hooks.php',
@@ -166,8 +166,8 @@ function createPluginZip() {
   console.log('Building WordPress plugin...');
   
   // Copy main plugin file
-  if (fs.existsSync('contact-form-7-database.php')) {
-    fs.copyFileSync('contact-form-7-database.php', path.join(tempPluginDir, 'contact-form-7-database.php'));
+  if (fs.existsSync('leadsync.php')) {
+    fs.copyFileSync('leadsync.php', path.join(tempPluginDir, 'leadsync.php'));
     console.log('Copied main plugin file');
   }
   
@@ -289,7 +289,7 @@ Initial release of the advanced plugin with comprehensive features.
   });
   
   archive.pipe(output);
-  archive.directory(tempPluginDir, false);
+  archive.directory(tempPluginDir, PLUGIN_NAME);
   archive.finalize();
 }
 
@@ -310,7 +310,7 @@ async function main() {
   }
 
   // Check if main plugin file exists
-  if (!fs.existsSync('contact-form-7-database.php')) {
+  if (!fs.existsSync('leadsync.php')) {
     console.error('Error: Main plugin file does not exist.');
     process.exit(1);
   }
