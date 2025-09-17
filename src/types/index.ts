@@ -39,8 +39,7 @@ export interface TableSettings {
   checkbox: boolean;
   size: 'small' | 'middle' | 'default';
   tableScroll: 'scroll' | 'fixed';
-  paginationTop: string;
-  paginationBottom: string;
+  pagination: string;
 }
 
 export interface ColumnSetting {

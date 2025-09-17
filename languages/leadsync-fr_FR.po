@@ -1,0 +1,145 @@
+# French (France) translation for LeadSync
+# Copyright (C) 2024 LeadSync
+# This file is distributed under the same license as the LeadSync package.
+msgid ""
+msgstr ""
+"Project-Id-Version: LeadSync 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/leadsync\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: LeadSync Team\n"
+"Language-Team: French (France)\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: leadsync.php:62
+msgid "LeadSync requires Contact Form 7 to be installed and active."
+msgstr "LeadSync nécessite que Contact Form 7 soit installé et actif."
+
+#: includes/components/class-admin-interface.php:75
+msgid "LeadSync"
+msgstr "LeadSync"
+
+#: includes/components/class-admin-interface.php:133
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Vous n'avez pas les permissions suffisantes pour accéder à cette page."
+
+#: includes/components/class-admin-interface.php:134
+msgid "Access Denied"
+msgstr "Accès Refusé"
+
+#: includes/components/class-admin-interface.php:178
+msgid "Form ID is required"
+msgstr "L'ID du formulaire est requis"
+
+#: includes/components/class-admin-interface.php:194
+msgid "You do not have permission to view submissions"
+msgstr "Vous n'avez pas la permission de voir les soumissions"
+
+#: includes/components/class-admin-interface.php:235
+msgid "You do not have permission to delete submissions"
+msgstr "Vous n'avez pas la permission de supprimer les soumissions"
+
+#: includes/components/class-admin-interface.php:241
+msgid "Submission ID is required"
+msgstr "L'ID de soumission est requis"
+
+#: includes/components/class-admin-interface.php:255
+msgid "Submission deleted successfully"
+msgstr "Soumission supprimée avec succès"
+
+#: includes/components/class-admin-interface.php:257
+msgid "Failed to delete submission"
+msgstr "Échec de la suppression de la soumission"
+
+#: includes/components/class-admin-interface.php:261
+msgid "An error occurred while deleting the submission"
+msgstr "Une erreur s'est produite lors de la suppression de la soumission"
+
+#: includes/components/class-admin-interface.php:264
+msgid "A fatal error occurred while deleting the submission"
+msgstr "Une erreur fatale s'est produite lors de la suppression de la soumission"
+
+#: includes/components/class-admin-interface.php:277
+msgid "You do not have permission to export data"
+msgstr "Vous n'avez pas la permission d'exporter les données"
+
+#: includes/components/class-admin-interface.php:294
+msgid "No submissions found to export"
+msgstr "Aucune soumission trouvée à exporter"
+
+#: includes/components/class-admin-interface.php:308
+msgid "Security check failed"
+msgstr "Vérification de sécurité échouée"
+
+#: includes/components/class-admin-interface.php:313
+#: includes/components/class-admin-interface.php:374
+msgid "Insufficient permissions"
+msgstr "Permissions insuffisantes"
+
+#: includes/components/class-admin-interface.php:331
+msgid "No settings data provided"
+msgstr "Aucune donnée de paramètres fournie"
+
+#: includes/components/class-admin-interface.php:357
+msgid "Settings saved successfully"
+msgstr "Paramètres sauvegardés avec succès"
+
+#: includes/components/class-admin-interface.php:359
+msgid "Failed to save settings"
+msgstr "Échec de la sauvegarde des paramètres"
+
+#: includes/components/class-admin-interface.php:395
+msgid "Invalid form ID or column configuration"
+msgstr "ID de formulaire ou configuration de colonne invalide"
+
+#: includes/components/class-admin-interface.php:402
+msgid "Column configuration saved successfully"
+msgstr "Configuration de colonne sauvegardée avec succès"
+
+#: includes/components/class-admin-interface.php:404
+msgid "Failed to save column configuration"
+msgstr "Échec de la sauvegarde de la configuration de colonne"
+
+#: includes/components/class-admin-interface.php:417
+msgid "Invalid form ID"
+msgstr "ID de formulaire invalide"
+
+#: includes/components/class-admin-interface.php:495
+msgid "Invalid table settings"
+msgstr "Paramètres de tableau invalides"
+
+#: includes/components/class-admin-interface.php:502
+msgid "Table settings saved successfully"
+msgstr "Paramètres de tableau sauvegardés avec succès"
+
+#: includes/components/class-admin-interface.php:504
+msgid "Failed to save table settings"
+msgstr "Échec de la sauvegarde des paramètres de tableau"
+
+#: includes/components/class-admin-interface.php:527
+#: includes/components/class-admin-interface.php:550
+#: includes/components/class-admin-interface.php:574
+#: includes/components/class-admin-interface.php:599
+#: includes/components/class-admin-interface.php:620
+msgid "You do not have permission to manage data"
+msgstr "Vous n'avez pas la permission de gérer les données"
+
+#: includes/components/class-admin-interface.php:582
+msgid "CFDB7 data exported successfully"
+msgstr "Données CFDB7 exportées avec succès"
+
+#: includes/components/class-admin-interface.php:587
+msgid "Failed to export CFDB7 data"
+msgstr "Échec de l'exportation des données CFDB7"
+
+#: includes/components/class-admin-interface.php:606
+msgid "CFDB7 data cleaned up successfully"
+msgstr "Données CFDB7 nettoyées avec succès"
+
+#: includes/components/class-admin-interface.php:608
+msgid "Failed to cleanup CFDB7 data or migration not complete"
+msgstr "Échec du nettoyage des données CFDB7 ou migration non terminée"

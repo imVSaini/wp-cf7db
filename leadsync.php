@@ -65,6 +65,9 @@ function cf7dba_missing_cf7_notice() {
 }
 
 add_action( 'plugins_loaded', function () {
+	// Load plugin text domain
+	load_plugin_textdomain( 'leadsync', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	
 	if ( ! class_exists( 'WPCF7_ContactForm' ) ) {
 		add_action( 'admin_notices', 'cf7dba_missing_cf7_notice' );
 		return;
@@ -72,6 +75,7 @@ add_action( 'plugins_loaded', function () {
 
 	// Run database migrations if needed
 	CF7DBA\Activator::maybe_add_submit_ip_column();
+	CF7DBA\Activator::maybe_add_idempotency_key();
 
 	// Initialize components
 	$database_operations = new CF7DBA\Components\Database_Operations();

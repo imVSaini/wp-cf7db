@@ -58,6 +58,8 @@ class Admin_Interface {
 		add_action( 'wp_ajax_cf7dba_get_settings', array( $this, 'ajax_get_settings' ) );
 		add_action( 'wp_ajax_cf7dba_save_column_config', array( $this, 'ajax_save_column_config' ) );
 		add_action( 'wp_ajax_cf7dba_get_column_config', array( $this, 'ajax_get_column_config' ) );
+		add_action( 'wp_ajax_cf7dba_save_table_settings', array( $this, 'ajax_save_table_settings' ) );
+		add_action( 'wp_ajax_cf7dba_get_table_settings', array( $this, 'ajax_get_table_settings' ) );
 		add_action( 'wp_ajax_cf7dba_check_migration', array( $this, 'ajax_check_migration' ) );
 		add_action( 'wp_ajax_cf7dba_migrate_data', array( $this, 'ajax_migrate_data' ) );
 		add_action( 'wp_ajax_cf7dba_export_cfdb7_backup', array( $this, 'ajax_export_cfdb7_backup' ) );
@@ -70,8 +72,8 @@ class Admin_Interface {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			__( 'LeadSync', 'cf7dba' ),
-			__( 'LeadSync', 'cf7dba' ),
+			__( 'LeadSync', 'leadsync' ),
+			__( 'LeadSync', 'leadsync' ),
 			'edit_posts', // Editors have this capability
 			'cf7dba-dashboard',
 			array( $this, 'admin_page' ),
@@ -128,15 +130,15 @@ class Admin_Interface {
 		// Check if user has access to the plugin
 		if ( ! $this->submission_manager->user_has_access() ) {
 			wp_die( 
-				__( 'You do not have sufficient permissions to access this page.', 'cf7dba' ),
-				__( 'Access Denied', 'cf7dba' ),
+				__( 'You do not have sufficient permissions to access this page.', 'leadsync' ),
+				__( 'Access Denied', 'leadsync' ),
 				array( 'response' => 403 )
 			);
 		}
 		
 		?>
 		<div class="wrap">
-			<!-- <h1><?php // esc_html_e( 'LeadSync', 'cf7dba' ); ?></h1> -->
+			<!-- <h1><?php // esc_html_e( 'LeadSync', 'leadsync' ); ?></h1> -->
 			<div id="cf7db-admin-app">
 				<p>Loading LeadSync...</p>
 				<p>If this message persists, please check the browser console for errors.</p>
@@ -173,7 +175,7 @@ class Admin_Interface {
 		$form_id = sanitize_text_field( $_POST['form_id'] ?? '' );
 		
 		if ( empty( $form_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Form ID is required', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Form ID is required', 'leadsync' ) ) );
 		}
 
 		$fields = $this->form_manager->get_form_fields( $form_id );
@@ -189,7 +191,7 @@ class Admin_Interface {
 
 		// Check if user has access to view submissions
 		if ( ! $this->submission_manager->user_has_access() ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to view submissions', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to view submissions', 'leadsync' ) ) );
 		}
 
 		$args = array(
@@ -230,13 +232,13 @@ class Admin_Interface {
 			$can_delete = $this->submission_manager->user_can_perform_action( 'delete' );
 			
 			if ( ! $can_delete ) {
-				wp_send_json_error( array( 'message' => __( 'You do not have permission to delete submissions', 'cf7dba' ) ) );
+				wp_send_json_error( array( 'message' => __( 'You do not have permission to delete submissions', 'leadsync' ) ) );
 			}
 
 			$submission_id = intval( $_POST['submission_id'] ?? 0 );
 			
 			if ( empty( $submission_id ) ) {
-				wp_send_json_error( array( 'message' => __( 'Submission ID is required', 'cf7dba' ) ) );
+				wp_send_json_error( array( 'message' => __( 'Submission ID is required', 'leadsync' ) ) );
 			}
 
 			// Check if delete_submission method exists
@@ -250,16 +252,16 @@ class Admin_Interface {
 			ob_clean();
 			
 			if ( $result ) {
-				wp_send_json_success( array( 'message' => __( 'Submission deleted successfully', 'cf7dba' ) ) );
+				wp_send_json_success( array( 'message' => __( 'Submission deleted successfully', 'leadsync' ) ) );
 			} else {
-				wp_send_json_error( array( 'message' => __( 'Failed to delete submission', 'cf7dba' ) ) );
+				wp_send_json_error( array( 'message' => __( 'Failed to delete submission', 'leadsync' ) ) );
 			}
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			ob_get_clean();
-			wp_send_json_error( array( 'message' => __( 'An error occurred while deleting the submission', 'cf7dba' ) ) );
-		} catch ( Error $e ) {
+			wp_send_json_error( array( 'message' => __( 'An error occurred while deleting the submission', 'leadsync' ) ) );
+		} catch ( \Error $e ) {
 			ob_get_clean();
-			wp_send_json_error( array( 'message' => __( 'A fatal error occurred while deleting the submission', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'A fatal error occurred while deleting the submission', 'leadsync' ) ) );
 		}
 	}
 
@@ -272,7 +274,7 @@ class Admin_Interface {
 
 		// Check if user has export permissions
 		if ( ! $this->submission_manager->user_can_perform_action( 'export' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to export data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to export data', 'leadsync' ) ) );
 		}
 
 		$form_id = sanitize_text_field( $_POST['form_id'] ?? '' );
@@ -289,7 +291,7 @@ class Admin_Interface {
 		$result = $this->submission_manager->get_submissions( $args );
 		
 		if ( empty( $result['submissions'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'No submissions found to export', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'No submissions found to export', 'leadsync' ) ) );
 		}
 
 		$csv_data = $this->export_manager->generate_csv( $result['submissions'], $form_id );
@@ -303,12 +305,12 @@ class Admin_Interface {
 	public function ajax_save_settings() {
 		// Check nonce
 		if ( ! check_ajax_referer( 'cf7dba_nonce', 'nonce', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed', 'leadsync' ) ) );
 		}
 
 		// Check if user has permission (only administrators can save settings)
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'leadsync' ) ) );
 		}
 
 		// Parse settings from POST data
@@ -326,7 +328,7 @@ class Admin_Interface {
 		}
 
 		if ( empty( $settings ) ) {
-			wp_send_json_error( array( 'message' => __( 'No settings data provided', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'No settings data provided', 'leadsync' ) ) );
 		}
 
 		// Sanitize settings (skip Advanced Settings for now)
@@ -352,9 +354,9 @@ class Admin_Interface {
 		$success = $this->submission_manager->save_settings( $sanitized_settings );
 
 		if ( $success ) {
-			wp_send_json_success( array( 'message' => __( 'Settings saved successfully', 'cf7dba' ) ) );
+			wp_send_json_success( array( 'message' => __( 'Settings saved successfully', 'leadsync' ) ) );
 		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to save settings', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Failed to save settings', 'leadsync' ) ) );
 		}
 	}
 
@@ -364,12 +366,12 @@ class Admin_Interface {
 	public function ajax_get_settings() {
 		// Check nonce
 		if ( ! check_ajax_referer( 'cf7dba_nonce', 'nonce', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed', 'leadsync' ) ) );
 		}
 
 		// Check if user has access
 		if ( ! $this->submission_manager->user_has_access() ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'leadsync' ) ) );
 		}
 
 		// Get settings using the database operations
@@ -386,26 +388,20 @@ class Admin_Interface {
 	public function ajax_save_column_config() {
 		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
 
-		// Check if user has permission to manage columns
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage columns', 'cf7dba' ) ) );
-			return;
-		}
-
 		$form_id = sanitize_text_field( $_POST['form_id'] ?? '' );
 		$column_config = json_decode( stripslashes( $_POST['column_config'] ?? '[]' ), true );
 
 		if ( empty( $form_id ) || ! is_array( $column_config ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid form ID or column configuration', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid form ID or column configuration', 'leadsync' ) ) );
 			return;
 		}
 
 		$success = $this->submission_manager->save_column_config( $form_id, $column_config );
 
 		if ( $success ) {
-			wp_send_json_success( array( 'message' => __( 'Column configuration saved successfully', 'cf7dba' ) ) );
+			wp_send_json_success( array( 'message' => __( 'Column configuration saved successfully', 'leadsync' ) ) );
 		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to save column configuration', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Failed to save column configuration', 'leadsync' ) ) );
 		}
 	}
 
@@ -415,23 +411,110 @@ class Admin_Interface {
 	public function ajax_get_column_config() {
 		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
 
-		// Check if user has access to view data
-		if ( ! $this->submission_manager->user_has_access() ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'cf7dba' ) ) );
-			return;
-		}
-
 		$form_id = sanitize_text_field( $_POST['form_id'] ?? '' );
 
 		if ( empty( $form_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid form ID', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid form ID', 'leadsync' ) ) );
 			return;
 		}
 
-		$column_config = $this->submission_manager->get_column_config( $form_id );
+		// Get form fields for dynamic default generation
+		$form_fields = array();
+		if ( class_exists( 'WPCF7_ContactForm' ) ) {
+			/** @var \WPCF7_ContactForm $contact_form */
+			$contact_form = \WPCF7_ContactForm::get_instance( $form_id );
+			if ( $contact_form ) {
+				$form_fields = $this->get_form_fields_from_cf7( $contact_form );
+			}
+		}
+
+		$column_config = $this->submission_manager->get_column_config( $form_id, $form_fields );
 
 		wp_send_json_success( array( 'column_config' => $column_config ) );
 	}
+
+	/**
+	 * Extract form fields from CF7 contact form
+	 *
+	 * @param \WPCF7_ContactForm $contact_form
+	 * @return array
+	 */
+	private function get_form_fields_from_cf7( $contact_form ) {
+		$form_fields = array();
+		
+		if ( ! $contact_form ) {
+			return $form_fields;
+		}
+
+		// Get form content
+		$form_content = $contact_form->prop( 'form' );
+		
+		// Parse form tags using CF7's built-in parser
+		$form_tags = $contact_form->scan_form_tags();
+		
+		foreach ( $form_tags as $tag ) {
+			$field_name = $tag->name;
+			$field_type = $tag->type;
+			
+			// Skip system fields and non-input fields
+			if ( empty( $field_name ) || in_array( $field_type, array( 'submit', 'reset', 'button' ) ) ) {
+				continue;
+			}
+			
+			// Get field label from tag options or use name
+			$field_label = '';
+			if ( isset( $tag->options ) && is_array( $tag->options ) ) {
+				foreach ( $tag->options as $option ) {
+					if ( strpos( $option, 'label:' ) === 0 ) {
+						$field_label = substr( $option, 6 );
+						break;
+					}
+				}
+			}
+			
+			$form_fields[] = array(
+				'name' => $field_name,
+				'label' => $field_label,
+				'type' => $field_type
+			);
+		}
+		
+		return $form_fields;
+	}
+
+	/**
+	 * AJAX: Save table settings
+	 */
+	public function ajax_save_table_settings() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		$table_settings_raw = stripslashes( $_POST['table_settings'] ?? '{}' );
+		$table_settings = json_decode( $table_settings_raw, true );
+
+		if ( ! is_array( $table_settings ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid table settings', 'leadsync' ) ) );
+			return;
+		}
+
+		$success = $this->submission_manager->save_table_settings( $table_settings );
+
+		if ( $success ) {
+			wp_send_json_success( array( 'message' => __( 'Table settings saved successfully', 'leadsync' ) ) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to save table settings', 'leadsync' ) ) );
+		}
+	}
+
+	/**
+	 * AJAX: Get table settings
+	 */
+	public function ajax_get_table_settings() {
+		check_ajax_referer( 'cf7dba_nonce', 'nonce' );
+
+		$settings = $this->submission_manager->get_table_settings();
+		wp_send_json_success( array( 'table_settings' => $settings ) );
+	}
+
 
 	/**
 	 * AJAX: Check migration status
@@ -441,7 +524,7 @@ class Admin_Interface {
 
 		// Check if user has access to manage data
 		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'leadsync' ) ) );
 			return;
 		}
 
@@ -464,7 +547,7 @@ class Admin_Interface {
 
 		// Check if user has access to manage data
 		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'leadsync' ) ) );
 			return;
 		}
 
@@ -488,7 +571,7 @@ class Admin_Interface {
 
 		// Check if user has access to manage data
 		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'leadsync' ) ) );
 			return;
 		}
 
@@ -496,12 +579,12 @@ class Admin_Interface {
 
 		if ( $result && isset( $result['file_url'] ) ) {
 			wp_send_json_success( array( 
-				'message' => __( 'CFDB7 data exported successfully', 'cf7dba' ),
+				'message' => __( 'CFDB7 data exported successfully', 'leadsync' ),
 				'filepath' => $result['file_url'],
 				'filename' => $result['filename']
 			) );
 		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to export CFDB7 data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Failed to export CFDB7 data', 'leadsync' ) ) );
 		}
 	}
 
@@ -513,16 +596,16 @@ class Admin_Interface {
 
 		// Check if user has access to manage data
 		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'leadsync' ) ) );
 			return;
 		}
 
 		$success = $this->migration_manager->cleanup_cfdb7_data();
 
 		if ( $success ) {
-			wp_send_json_success( array( 'message' => __( 'CFDB7 data cleaned up successfully', 'cf7dba' ) ) );
+			wp_send_json_success( array( 'message' => __( 'CFDB7 data cleaned up successfully', 'leadsync' ) ) );
 		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to cleanup CFDB7 data or migration not complete', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Failed to cleanup CFDB7 data or migration not complete', 'leadsync' ) ) );
 		}
 	}
 
@@ -534,7 +617,7 @@ class Admin_Interface {
 
 		// Check if user has access to manage data
 		if ( ! $this->submission_manager->user_can_perform_action( 'manage' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'cf7dba' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to manage data', 'leadsync' ) ) );
 			return;
 		}
 

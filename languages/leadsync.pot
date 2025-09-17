@@ -1,0 +1,157 @@
+# Copyright (C) 2024 LeadSync
+# This file is distributed under the same license as the LeadSync package.
+msgid ""
+msgstr ""
+"Project-Id-Version: LeadSync 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/leadsync\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: leadsync.php:62
+msgid "LeadSync requires Contact Form 7 to be installed and active."
+msgstr ""
+
+#: includes/components/class-admin-interface.php:75
+msgid "LeadSync"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:133
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: includes/components/class-admin-interface.php:134
+msgid "Access Denied"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:178
+msgid "Form ID is required"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:194
+msgid "You do not have permission to view submissions"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:235
+msgid "You do not have permission to delete submissions"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:241
+msgid "Submission ID is required"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:255
+msgid "Submission deleted successfully"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:257
+msgid "Failed to delete submission"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:261
+msgid "An error occurred while deleting the submission"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:264
+msgid "A fatal error occurred while deleting the submission"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:277
+msgid "You do not have permission to export data"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:294
+msgid "No submissions found to export"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:308
+msgid "Security check failed"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:313
+msgid "Insufficient permissions"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:331
+msgid "No settings data provided"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:357
+msgid "Settings saved successfully"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:359
+msgid "Failed to save settings"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:374
+msgid "Insufficient permissions"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:395
+msgid "Invalid form ID or column configuration"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:402
+msgid "Column configuration saved successfully"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:404
+msgid "Failed to save column configuration"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:417
+msgid "Invalid form ID"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:495
+msgid "Invalid table settings"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:502
+msgid "Table settings saved successfully"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:504
+msgid "Failed to save table settings"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:527
+msgid "You do not have permission to manage data"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:550
+msgid "You do not have permission to manage data"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:574
+msgid "You do not have permission to manage data"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:582
+msgid "CFDB7 data exported successfully"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:587
+msgid "Failed to export CFDB7 data"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:599
+msgid "You do not have permission to manage data"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:606
+msgid "CFDB7 data cleaned up successfully"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:608
+msgid "Failed to cleanup CFDB7 data or migration not complete"
+msgstr ""
+
+#: includes/components/class-admin-interface.php:620
+msgid "You do not have permission to manage data"
+msgstr ""

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Layout, Select, Button, Input, DatePicker, Space, Modal, Form, Switch, Select as AntSelect, Divider, Typography, message } from 'antd';
-import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, AppstoreOutlined, LoadingOutlined, SettingOutlined, DatabaseOutlined } from '@ant-design/icons';
+import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, AppstoreOutlined, LoadingOutlined, SettingOutlined, DatabaseOutlined, CloseOutlined } from '@ant-design/icons';
 import SubmissionsTable from './SubmissionsTable';
 import MigrationModal from '../modals/MigrationModal';
 import { toast } from '../ui/shared';
@@ -29,13 +29,19 @@ const ContactForm7Database: React.FC = () => {
     return dateRange ? [dateRange[0].format('YYYY-MM-DD'), dateRange[1].format('YYYY-MM-DD')] : null;
   }, [dateRange]);
 
+  // Search loading state
+  const [isSearching, setIsSearching] = useState(false);
+  
+  // Debounced search query state
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
   // API hooks
-  const { getForms, getSettings, saveSettings, exportCSV, error: apiError } = useApi();
+  const { getForms, getSettings, saveSettings, exportCSV, error: apiError, getTableSettings, saveTableSettings } = useApi();
   const { formFields, loading: fieldsLoading, error: fieldsError } = useFormData(selectedForm);
   const { submissions, total, loadSubmissions, loading: submissionsLoading, error: submissionsError } = useSubmissions(
     selectedForm,
     pagination,
-    searchQuery,
+    debouncedSearchQuery,
     dateRangeString
   );
 
@@ -66,42 +72,41 @@ const ContactForm7Database: React.FC = () => {
     }
   }, [getForms]);
 
-  // Debounced search effect
-  const debouncedSearch = useMemo(() => {
-    let timeoutId: number;
-    return (callback: () => void, delay: number) => {
-      clearTimeout(timeoutId);
-      timeoutId = window.setTimeout(callback, delay);
-    };
-  }, []);
-
-  // Search loading state
-  const [isSearching, setIsSearching] = useState(false);
-  
   // Settings modal state
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [settingsForm] = Form.useForm();
 
   // Table settings state (persists across form switches)
+  // Initialize with empty object - will be populated from backend
   const [tableSettings, setTableSettings] = useState<TableSettings>({
     bordered: true,
     title: true,
     columnHeader: true,
-    expandable: true,
+    expandable: false,
     fixedHeader: true,
     ellipsis: true,
     footer: true,
     checkbox: true,
-    size: 'middle',
+    size: 'small',
     tableScroll: 'fixed',
-    paginationTop: 'None',
-    paginationBottom: 'Bottom Left'
-  });
+    pagination: 'Right'
+  } as TableSettings);
 
   // Fetch available forms on component mount
   useEffect(() => {
     fetchForms();
   }, [fetchForms]);
+
+  // Load table settings once (global)
+  useEffect(() => {
+    const loadSettings = async () => {
+      const settings = await getTableSettings();
+      if (settings) {
+        setTableSettings(prev => ({ ...prev, ...(settings as any) }));
+      }
+    };
+    loadSettings();
+  }, [getTableSettings]);
 
   // Update pagination total when submissions change
   useEffect(() => {
@@ -120,25 +125,32 @@ const ContactForm7Database: React.FC = () => {
     // Submissions will be loaded automatically by the useSubmissions hook
   }, [selectedForm, dateRange]);
 
-  // Debounced effect for search queries only
+  // Debounced search effect - properly debounce search queries
   useEffect(() => {
     if (!selectedForm) return;
 
-    // Only debounce search queries for better UX
-    setIsSearching(true);
-    debouncedSearch(() => {
-      // Submissions will be loaded automatically by the useSubmissions hook
+    // Set loading state when search query changes
+    if (searchQuery !== debouncedSearchQuery) {
+      setIsSearching(true);
+    }
+
+    // Debounce the search query update
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
       setIsSearching(false);
     }, 300);
-  }, [searchQuery, debouncedSearch, selectedForm]);
 
-  const handleFilter = useCallback(() => {
-    // Reset to first page and fetch filtered data
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, selectedForm, debouncedSearchQuery]);
+
+  // Reset pagination when search changes
+  useEffect(() => {
+    if (debouncedSearchQuery !== searchQuery) return; // Only when debounced value changes
+    
     setPagination(prev => ({ ...prev, current: 1 }));
-    setIsSearching(true);
-    // Submissions will be loaded automatically by the useSubmissions hook
-    setIsSearching(false);
-  }, []);
+  }, [debouncedSearchQuery, searchQuery]);
+
+  // handleFilter removed - search is now handled automatically via debouncing
 
 
   const handleQuickDateRange = useCallback((range: string) => {
@@ -234,6 +246,16 @@ const ContactForm7Database: React.FC = () => {
     }
   }, []);
 
+  // Persist table settings to backend
+  const handleTableSettingsChange = useCallback(async (newSettings: TableSettings) => {
+    setTableSettings(newSettings);
+    try {
+      await saveTableSettings(newSettings as any);
+      toast.success('Table settings saved successfully');
+    } catch (e) {
+      message.error('Failed to save table settings');
+    }
+  }, [saveTableSettings]);
 
   // Memoized styles
   const headerStyles = useMemo(() => ({
@@ -416,11 +438,35 @@ const ContactForm7Database: React.FC = () => {
           
           {/* Search Input */}
           <Input
-            placeholder="Type Something..."
+            placeholder="Search submissions..."
             prefix={isSearching ? <LoadingOutlined style={{ color: '#1890ff' }} /> : <SearchOutlined style={{ color: '#8c8c8c' }} />}
+            suffix={searchQuery ? (
+              <Button
+                type="text"
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={() => {
+                  setSearchQuery('');
+                  setDebouncedSearchQuery('');
+                  setIsSearching(false);
+                }}
+                style={{ 
+                  border: 'none',
+                  boxShadow: 'none',
+                  color: '#8c8c8c',
+                  padding: '5px',
+                  height: 'auto'
+                }}
+              />
+            ) : null}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onPressEnter={handleFilter}
+            onPressEnter={() => {
+              // Immediately apply search on Enter
+              setDebouncedSearchQuery(searchQuery);
+              setPagination(prev => ({ ...prev, current: 1 }));
+            }}
+            allowClear={false} // We handle clear with custom button
             style={{ 
               width: '280px',
               height: '40px',
@@ -622,7 +668,7 @@ const ContactForm7Database: React.FC = () => {
               onRefresh={loadSubmissions}
               formId={selectedForm}
               tableSettings={tableSettings}
-              onTableSettingsChange={setTableSettings}
+              onTableSettingsChange={handleTableSettingsChange}
             />
           )}
         </div>

@@ -200,7 +200,7 @@ const ColumnManagerModal: React.FC<ColumnManagerModalProps> = ({
         ]}
       >
         <div style={{ marginBottom: '16px' }}>
-          <TypographyText strong>Drag to reorder columns, toggle visibility, and customize titles</TypographyText>
+          <TypographyText>Drag to reorder columns, toggle visibility, and customize titles</TypographyText>
         </div>
 
         <div style={{ maxHeight: '400px', overflowY: 'auto' }}>

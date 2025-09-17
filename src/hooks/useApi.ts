@@ -82,6 +82,16 @@ export const useApi = () => {
     return executeApiCall(() => apiService.saveColumnConfig(formId, columnConfig));
   }, [executeApiCall]);
 
+  // Table settings API hooks
+  const getTableSettings = useCallback(async () => {
+    return executeApiCall(() => apiService.getTableSettings());
+  }, [executeApiCall]);
+
+  const saveTableSettings = useCallback(async (tableSettings: Record<string, any>) => {
+    return executeApiCall(() => apiService.saveTableSettings(tableSettings));
+  }, [executeApiCall]);
+
+
   // Export API hooks
   const exportCSV = useCallback(async (params: {
     form_id: string;
@@ -139,6 +149,8 @@ export const useApi = () => {
     saveSettings,
     getColumnConfig,
     saveColumnConfig,
+    getTableSettings,
+    saveTableSettings,
     exportCSV,
     
     // Migration methods

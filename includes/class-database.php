@@ -101,9 +101,32 @@ class Database {
 		}
 
 		if ( ! empty( $args['search'] ) ) {
-			$where[] = 'form_data LIKE %s';
-			$like = '%' . $this->wpdb->esc_like( $args['search'] ) . '%';
-			$params[] = $like;
+			// Enhanced search within JSON form_data values
+			// Uses multiple methods for better compatibility and accuracy
+			$search_term = $this->wpdb->esc_like( $args['search'] );
+			$search_lower = strtolower( $search_term );
+			
+			// Check if MySQL supports JSON functions (MySQL 5.7+)
+			$mysql_version = $this->wpdb->get_var( 'SELECT VERSION()' );
+			$supports_json = version_compare( $mysql_version, '5.7.0', '>=' );
+			
+			if ( $supports_json ) {
+				// Use JSON functions for more accurate search
+				$where[] = '(
+					form_data LIKE %s OR
+					JSON_SEARCH(LOWER(form_data), "one", LOWER(%s)) IS NOT NULL OR
+					JSON_SEARCH(LOWER(form_data), "all", LOWER(%s)) IS NOT NULL
+				)';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+				$params[] = '%' . $search_lower . '%';
+				$params[] = '%' . $search_lower . '%';
+			} else {
+				// Fallback to simple LIKE search for older MySQL versions
+				$where[] = 'form_data LIKE %s';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+			}
 		}
 
 		$sql = 'SELECT * FROM ' . $this->submissions_table;
@@ -192,9 +215,32 @@ class Database {
 		}
 
 		if ( ! empty( $args['search'] ) ) {
-			$where[] = 'form_data LIKE %s';
-			$like = '%' . $this->wpdb->esc_like( $args['search'] ) . '%';
-			$params[] = $like;
+			// Enhanced search within JSON form_data values
+			// Uses multiple methods for better compatibility and accuracy
+			$search_term = $this->wpdb->esc_like( $args['search'] );
+			$search_lower = strtolower( $search_term );
+			
+			// Check if MySQL supports JSON functions (MySQL 5.7+)
+			$mysql_version = $this->wpdb->get_var( 'SELECT VERSION()' );
+			$supports_json = version_compare( $mysql_version, '5.7.0', '>=' );
+			
+			if ( $supports_json ) {
+				// Use JSON functions for more accurate search
+				$where[] = '(
+					form_data LIKE %s OR
+					JSON_SEARCH(LOWER(form_data), "one", LOWER(%s)) IS NOT NULL OR
+					JSON_SEARCH(LOWER(form_data), "all", LOWER(%s)) IS NOT NULL
+				)';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+				$params[] = '%' . $search_lower . '%';
+				$params[] = '%' . $search_lower . '%';
+			} else {
+				// Fallback to simple LIKE search for older MySQL versions
+				$where[] = 'form_data LIKE %s';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+			}
 		}
 
 		$sql = 'SELECT COUNT(*) FROM ' . $this->submissions_table;

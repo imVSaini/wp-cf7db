@@ -43,24 +43,48 @@ class Database_Operations {
 		$form_id = $submission_data['form_id'] ?? 0;
 		$form_title = $submission_data['form_title'] ?? '';
 		$form_data = $submission_data['form_data'] ?? array();
+		$idempotency_key = isset( $submission_data['idempotency_key'] ) ? (string) $submission_data['idempotency_key'] : null;
 
 		$submit_ip = $this->get_client_ip();
 		$submit_user_id = get_current_user_id();
 
+		// Try insert first; rely on unique index on idempotency_key
+		$insert_data = array(
+			'form_id' => (string) $form_id,
+			'form_title' => sanitize_text_field( $form_title ),
+			'form_data' => wp_json_encode( $this->sanitize_recursive( $form_data ) ),
+			'submit_ip' => $submit_ip,
+			'submit_user_id' => $submit_user_id,
+			'submit_datetime' => current_time( 'mysql' ),
+		);
+		$formats = array( '%s', '%s', '%s', '%s', '%d', '%s' );
+		if ( $idempotency_key ) {
+			$insert_data['idempotency_key'] = $idempotency_key;
+			$formats[] = '%s';
+		}
+
 		$inserted = $this->wpdb->insert(
 			$this->submissions_table,
-			array(
-				'form_id' => (string) $form_id,
-				'form_title' => sanitize_text_field( $form_title ),
-				'form_data' => wp_json_encode( $this->sanitize_recursive( $form_data ) ),
-				'submit_ip' => $submit_ip,
-				'submit_user_id' => $submit_user_id,
-				'submit_datetime' => current_time( 'mysql' ),
-			),
-			array( '%s', '%s', '%s', '%s', '%d', '%s' )
+			$insert_data,
+			$formats
 		);
 
-		return $inserted ? $this->wpdb->insert_id : false;
+		if ( $inserted ) {
+			return $this->wpdb->insert_id;
+		}
+
+		// On duplicate or error, if idempotency_key present, fetch existing row id
+		if ( $idempotency_key ) {
+			$existing_id = $this->wpdb->get_var( $this->wpdb->prepare(
+				"SELECT id FROM {$this->submissions_table} WHERE idempotency_key = %s",
+				$idempotency_key
+			) );
+			if ( $existing_id ) {
+				return (int) $existing_id;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -99,9 +123,32 @@ class Database_Operations {
 		}
 
 		if ( ! empty( $args['search'] ) ) {
-			$where[] = 'form_data LIKE %s';
-			$like = '%' . $this->wpdb->esc_like( $args['search'] ) . '%';
-			$params[] = $like;
+			// Enhanced search within JSON form_data values
+			// Uses multiple methods for better compatibility and accuracy
+			$search_term = $this->wpdb->esc_like( $args['search'] );
+			$search_lower = strtolower( $search_term );
+			
+			// Check if MySQL supports JSON functions (MySQL 5.7+)
+			$mysql_version = $this->wpdb->get_var( 'SELECT VERSION()' );
+			$supports_json = version_compare( $mysql_version, '5.7.0', '>=' );
+			
+			if ( $supports_json ) {
+				// Use JSON functions for more accurate search
+				$where[] = '(
+					form_data LIKE %s OR
+					JSON_SEARCH(LOWER(form_data), "one", LOWER(%s)) IS NOT NULL OR
+					JSON_SEARCH(LOWER(form_data), "all", LOWER(%s)) IS NOT NULL
+				)';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+				$params[] = '%' . $search_lower . '%';
+				$params[] = '%' . $search_lower . '%';
+			} else {
+				// Fallback to simple LIKE search for older MySQL versions
+				$where[] = 'form_data LIKE %s';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+			}
 		}
 
 		$sql = 'SELECT * FROM ' . $this->submissions_table;
@@ -127,6 +174,13 @@ class Database_Operations {
 		}
 
 		$prepared = $this->wpdb->prepare( $sql, $params );
+		
+		// Debug logging for search queries (enable in development)
+		if ( ! empty( $args['search'] ) && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'CF7DBA Search Query: ' . $prepared );
+			error_log( 'CF7DBA Search Params: ' . print_r( $params, true ) );
+		}
+		
 		$rows = $this->wpdb->get_results( $prepared, ARRAY_A );
 
 		$submissions = array_map( function( $row ) {
@@ -184,9 +238,32 @@ class Database_Operations {
 		}
 
 		if ( ! empty( $args['search'] ) ) {
-			$where[] = 'form_data LIKE %s';
-			$like = '%' . $this->wpdb->esc_like( $args['search'] ) . '%';
-			$params[] = $like;
+			// Enhanced search within JSON form_data values
+			// Uses multiple methods for better compatibility and accuracy
+			$search_term = $this->wpdb->esc_like( $args['search'] );
+			$search_lower = strtolower( $search_term );
+			
+			// Check if MySQL supports JSON functions (MySQL 5.7+)
+			$mysql_version = $this->wpdb->get_var( 'SELECT VERSION()' );
+			$supports_json = version_compare( $mysql_version, '5.7.0', '>=' );
+			
+			if ( $supports_json ) {
+				// Use JSON functions for more accurate search
+				$where[] = '(
+					form_data LIKE %s OR
+					JSON_SEARCH(LOWER(form_data), "one", LOWER(%s)) IS NOT NULL OR
+					JSON_SEARCH(LOWER(form_data), "all", LOWER(%s)) IS NOT NULL
+				)';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+				$params[] = '%' . $search_lower . '%';
+				$params[] = '%' . $search_lower . '%';
+			} else {
+				// Fallback to simple LIKE search for older MySQL versions
+				$where[] = 'form_data LIKE %s';
+				$like = '%' . $search_term . '%';
+				$params[] = $like;
+			}
 		}
 
 		$sql = 'SELECT COUNT(*) FROM ' . $this->submissions_table;
@@ -457,9 +534,10 @@ class Database_Operations {
 	 * Get column configuration for a form
 	 *
 	 * @param string $form_id
+	 * @param array $form_fields Optional form fields to generate dynamic defaults
 	 * @return array
 	 */
-	public function get_column_config( $form_id ) {
+	public function get_column_config( $form_id, $form_fields = array() ) {
 		$setting_key = 'column_config_' . $form_id;
 		
 		$result = $this->wpdb->get_var( $this->wpdb->prepare(
@@ -468,10 +546,149 @@ class Database_Operations {
 		) );
 
 		if ( $result ) {
-			return maybe_unserialize( $result );
+			$config = maybe_unserialize( $result );
+			if ( is_array( $config ) ) {
+				return $config;
+			}
 		}
 
-		return array();
+		// Return default configuration if no saved config found
+		return $this->get_default_column_config( $form_fields );
+	}
+
+	/**
+	 * Get default column configuration
+	 *
+	 * @param array $form_fields Optional form fields to generate dynamic defaults
+	 * @return array
+	 */
+	public function get_default_column_config( $form_fields = array() ) {
+		$cols = array();
+		
+		// Add ID column first
+		$cols[] = array(
+			'key' => 'id',
+			'title' => 'ID',
+			'visible' => false,
+			'order' => 0,
+			'width' => 100,
+			'isMetadata' => true
+		);
+
+		// Add form fields dynamically
+		if ( ! empty( $form_fields ) && is_array( $form_fields ) ) {
+			foreach ( $form_fields as $index => $field ) {
+				$field_name = isset( $field['name'] ) ? $field['name'] : '';
+				$field_label = isset( $field['label'] ) ? $field['label'] : '';
+				
+				if ( $field_name ) {
+					// Generate title from label or field name
+					$title = $field_label ?: str_replace( array( '-', '_' ), ' ', $field_name );
+					$title = ucwords( $title );
+					
+					$cols[] = array(
+						'key' => $field_name,
+						'title' => $title,
+						'visible' => true,
+						'order' => $index + 1,
+						'width' => 150
+					);
+				}
+			}
+		}
+
+		// Add essential metadata columns
+		$cols[] = array(
+			'key' => 'submit_ip',
+			'title' => 'IP',
+			'visible' => false,
+			'order' => count( $cols ),
+			'width' => 120,
+			'isMetadata' => true
+		);
+		
+		$cols[] = array(
+			'key' => 'submit_datetime',
+			'title' => 'Date',
+			'visible' => true,
+			'order' => count( $cols ) + 1,
+			'width' => 150,
+			'isMetadata' => true
+		);
+		
+		$cols[] = array(
+			'key' => 'submit_user_id',
+			'title' => 'User ID',
+			'visible' => false,
+			'order' => count( $cols ) + 2,
+			'width' => 100,
+			'isMetadata' => true
+		);
+
+		return $cols;
+	}
+
+	/**
+	 * Save table settings
+	 *
+	 * @param array $table_settings
+	 * @return bool
+	 */
+	public function save_table_settings( $table_settings ) {
+		$serialized_value = maybe_serialize( $table_settings );
+		
+		$result = $this->wpdb->replace(
+			$this->settings_table,
+			array(
+				'setting_key' => 'table_settings',
+				'setting_value' => $serialized_value,
+			),
+			array( '%s', '%s' )
+		);
+
+		return $result !== false;
+	}
+
+	/**
+	 * Get table settings (with defaults)
+	 *
+	 * @return array
+	 */
+	public function get_table_settings() {
+		$result = $this->wpdb->get_var( $this->wpdb->prepare(
+			"SELECT setting_value FROM {$this->settings_table} WHERE setting_key = %s",
+			'table_settings'
+		) );
+
+		if ( $result ) {
+			$settings = maybe_unserialize( $result );
+			if ( is_array( $settings ) ) {
+				return $settings;
+			}
+		}
+
+		return $this->get_default_table_settings();
+	}
+
+	/**
+	 * Get default table settings
+	 *
+	 * @return array
+	 */
+	public function get_default_table_settings() {
+		return array(
+			'bordered' => true,
+			'title' => true,
+			'columnHeader' => true,
+			'expandable' => false,
+			'fixedHeader' => true,
+			'ellipsis' => true,
+			'footer' => true,
+			'checkbox' => true,
+			'size' => 'small',
+			'tableScroll' => 'fixed',
+			'pagination' => 'Right'
+		);
 	}
 
 	/**
@@ -534,20 +751,11 @@ class Database_Operations {
 		}
 
 		// Get user settings
-		$settings = array();
-		try {
-			$settings = $this->get_settings();
-		} catch ( Exception $e ) {
-			return false;
-		}
+		$settings = $this->get_settings();
 
 		// If no settings found, use defaults
 		if ( empty( $settings ) ) {
-			try {
-				$settings = $this->get_default_settings();
-			} catch ( Exception $e ) {
-				return false;
-			}
+			$settings = $this->get_default_settings();
 		}
 
 		$user_roles = $user->roles;

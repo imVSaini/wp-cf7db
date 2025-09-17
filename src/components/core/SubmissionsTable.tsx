@@ -56,12 +56,14 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
   const loadColumnConfig = useCallback(async () => {
     if (!formId) return;
 
-    const columnConfig = await getColumnConfig(formId);
-    if (columnConfig && columnConfig.length > 0) {
-      // Loading column config from database
-      setColumns(columnConfig);
-    } else {
-      // No column config found in database, will use defaults
+    try {
+      const columnConfig = await getColumnConfig(formId);
+      // The PHP backend already handles default generation based on form fields
+      // So we always use what comes from the database/API
+      setColumns(columnConfig || []);
+    } catch (error) {
+      // If API fails, set empty columns (will show empty state)
+      setColumns([]);
     }
   }, [formId, getColumnConfig]);
 
@@ -86,68 +88,6 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       loadColumnConfig();
     }
   }, [formId, loadColumnConfig]);
-
-  const generateDefaultColumns = useCallback((formFields: FormField[]): ColumnConfig[] => {
-    const cols: ColumnConfig[] = [
-      {
-        key: 'id',
-        title: 'ID',
-        visible: true,
-        order: 0,
-        width: 100,
-        isMetadata: true
-      }
-    ];
-
-    // Add form fields
-    formFields.forEach((field, index) => {
-      cols.push({
-        key: field.name,
-        title: field.label || field.name.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        visible: true,
-        order: index + 1,
-        width: 150
-      });
-    });
-
-    // Add essential metadata
-    cols.push(
-      {
-        key: 'submit_ip',
-        title: 'Submit IP',
-        visible: false,
-        order: cols.length,
-        width: 120,
-        isMetadata: true
-      },
-      {
-        key: 'submit_datetime',
-        title: 'Submit Time',
-        visible: true,
-        order: cols.length + 1,
-        width: 150,
-        isMetadata: true
-      },
-      {
-        key: 'submit_user_id',
-        title: 'User ID',
-        visible: false,
-        order: cols.length + 2,
-        width: 100,
-        isMetadata: true
-      }
-    );
-
-    return cols;
-  }, []);
-
-  // Generate default columns when formFields change
-  useEffect(() => {
-    if (formFields.length > 0) {
-      const defaultColumns = generateDefaultColumns(formFields);
-      setColumns(defaultColumns);
-    }
-  }, [formFields, generateDefaultColumns]);
 
   // Helper function to get pagination alignment
   const getPaginationJustify = (position: string): 'start' | 'center' | 'end' => {
@@ -512,6 +452,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       title: 'ACTION',
       key: 'action',
       width: 120,
+      fixed: tableSettings.tableScroll === 'scroll' ? ('right' as const) : undefined,
       render: (_: any, record: Submission) => (
         <Space size="small">
           <Button
@@ -536,7 +477,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
         </Space>
       )
     }
-  ], [columns, tableSettings.ellipsis, handleEdit, handleView, handleDelete]);
+  ], [columns, tableSettings.ellipsis, tableSettings.tableScroll, handleEdit, handleView, handleDelete]);
 
   // Memoized styles
   const expandedRowStyles = useMemo(() => ({
@@ -861,7 +802,10 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
         size={tableSettings.size as any}
         bordered={tableSettings.bordered}
         showHeader={tableSettings.columnHeader}
-        scroll={tableSettings.fixedHeader ? { x: 1000, y: 480 } : { x: 1000 }}
+        scroll={tableSettings.fixedHeader ? 
+          { x: 1000, y: 480 } : 
+          { x: 1000 }
+        }
         rowSelection={tableSettings.checkbox ? {
           selectedRowKeys,
           onChange: setSelectedRowKeys,
@@ -872,7 +816,7 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
       />
 
       {/* Bottom Pagination */}
-      {shouldShowPagination(tableSettings.paginationBottom) && (
+      {shouldShowPagination(tableSettings.pagination) && (
         <div style={{ 
           marginTop: '24px',
           width: '100%',
@@ -910,8 +854,8 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: getPaginationJustify(tableSettings.paginationBottom) === 'start' ? 'flex-start' : 
-                           getPaginationJustify(tableSettings.paginationBottom) === 'end' ? 'flex-end' : 'center',
+            justifyContent: getPaginationJustify(tableSettings.pagination) === 'start' ? 'flex-start' : 
+                           getPaginationJustify(tableSettings.pagination) === 'end' ? 'flex-end' : 'center',
             flex: 1,
             margin: '0 20px'
           }}>

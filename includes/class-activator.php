@@ -46,11 +46,13 @@ class Activator {
 			id bigint(20) NOT NULL AUTO_INCREMENT,
 			form_id varchar(20) NOT NULL,
 			form_title varchar(255) NOT NULL,
+			idempotency_key varchar(64) DEFAULT NULL,
 			form_data longtext NOT NULL,
 			submit_ip varchar(45) DEFAULT NULL,
 			submit_datetime datetime DEFAULT CURRENT_TIMESTAMP,
 			submit_user_id bigint(20) DEFAULT NULL,
 			PRIMARY KEY (id),
+			UNIQUE KEY uniq_idempotency_key (idempotency_key),
 			KEY form_id (form_id),
 			KEY submit_datetime (submit_datetime),
 			KEY submit_user_id (submit_user_id)
@@ -79,6 +81,31 @@ class Activator {
 		
 		if ( empty( $column_exists ) ) {
 			$wpdb->query( "ALTER TABLE $table_name ADD COLUMN submit_ip varchar(45) DEFAULT NULL AFTER form_data" );
+		}
+	}
+
+	/**
+	 * Ensure idempotency key column and unique index exist (migration)
+	 */
+	public static function maybe_add_idempotency_key() {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'cf7dba_submissions';
+		$column_exists = $wpdb->get_results( "SHOW COLUMNS FROM $table_name LIKE 'idempotency_key'" );
+		
+		if ( empty( $column_exists ) ) {
+			$wpdb->query( "ALTER TABLE $table_name ADD COLUMN idempotency_key varchar(64) DEFAULT NULL AFTER form_title" );
+		}
+
+		// Add unique index if not exists
+		$index_exists = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(1) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = %s AND table_name = %s AND index_name = 'uniq_idempotency_key'",
+			DB_NAME,
+			$wpdb->prefix . 'cf7dba_submissions'
+		) );
+		
+		if ( (int) $index_exists === 0 ) {
+			$wpdb->query( "CREATE UNIQUE INDEX uniq_idempotency_key ON $table_name (idempotency_key)" );
 		}
 	}
 

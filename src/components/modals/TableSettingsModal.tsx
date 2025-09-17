@@ -33,12 +33,8 @@ const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
     setSettings(prev => ({ ...prev, tableScroll: value }));
   };
 
-  const handlePaginationTopChange = (value: string) => {
-    setSettings(prev => ({ ...prev, paginationTop: value }));
-  };
-
-  const handlePaginationBottomChange = (value: string) => {
-    setSettings(prev => ({ ...prev, paginationBottom: value }));
+  const handlePaginationChange = (value: string) => {
+    setSettings(prev => ({ ...prev, pagination: value }));
   };
 
   const handleSave = () => {
@@ -153,34 +149,18 @@ const TableSettingsModal: React.FC<TableSettingsModalProps> = ({
           </Radio.Group>
         </div>
 
-        {/* Pagination Top */}
+        {/* Pagination */}
         <div>
-          <div style={{ marginBottom: 8 }}>Pagination Top</div>
+          <div style={{ marginBottom: 8 }}>Pagination</div>
           <Select
-            value={settings.paginationTop}
-            onChange={handlePaginationTopChange}
+            value={settings.pagination}
+            onChange={handlePaginationChange}
             style={{ width: '100%' }}
             options={[
               { value: 'None', label: 'None' },
-              { value: 'Top Left', label: 'Top Left' },
-              { value: 'Top Center', label: 'Top Center' },
-              { value: 'Top Right', label: 'Top Right' }
-            ]}
-          />
-        </div>
-
-        {/* Pagination Bottom */}
-        <div>
-          <div style={{ marginBottom: 8 }}>Pagination Bottom</div>
-          <Select
-            value={settings.paginationBottom}
-            onChange={handlePaginationBottomChange}
-            style={{ width: '100%' }}
-            options={[
-              { value: 'None', label: 'None' },
-              { value: 'Bottom Left', label: 'Bottom Left' },
-              { value: 'Bottom Center', label: 'Bottom Center' },
-              { value: 'Bottom Right', label: 'Bottom Right' }
+              { value: 'Left', label: 'Left' },
+              { value: 'Center', label: 'Center' },
+              { value: 'Right', label: 'Right' }
             ]}
           />
         </div>

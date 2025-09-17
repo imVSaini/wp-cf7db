@@ -30,6 +30,10 @@ interface ColumnConfigResponse {
   column_config: ColumnConfig[];
 }
 
+interface TableSettingsResponse {
+  table_settings: Record<string, any>;
+}
+
 interface ExportResponse {
   csv_data: string;
 }
@@ -83,10 +87,10 @@ class WordPressApiService {
     
     if (response.success) {
       // Handle different response structures
-      if (response.data.forms) {
-        return response.data.forms;
+      if ((response.data as any).forms) {
+        return (response.data as any).forms;
       } else if (Array.isArray(response.data)) {
-        return response.data;
+        return response.data as any;
       } else {
         throw new Error('Unexpected response structure from server');
       }
@@ -100,8 +104,8 @@ class WordPressApiService {
     const response = await this.post<FormFieldsResponse>('cf7dba_get_form_fields', {
       form_id: formId,
     });
-    if (response.success && response.data.fields) {
-      return response.data.fields;
+    if (response.success && (response.data as any).fields) {
+      return (response.data as any).fields;
     }
     throw new Error(response.message || 'Failed to fetch form fields');
   }
@@ -119,11 +123,11 @@ class WordPressApiService {
     
     if (response.success) {
       return {
-        submissions: response.data.submissions || [],
+        submissions: (response.data as any).submissions || [],
         pagination: {
           current: params.page,
           pageSize: params.per_page,
-          total: response.data.total || 0,
+          total: (response.data as any).total || 0,
         },
       };
     }
@@ -143,8 +147,8 @@ class WordPressApiService {
   // Settings API methods
   async getSettings(): Promise<Record<string, any>> {
     const response = await this.post<SettingsResponse>('cf7dba_get_settings');
-    if (response.success && response.data.settings) {
-      return response.data.settings;
+    if (response.success && (response.data as any).settings) {
+      return (response.data as any).settings;
     }
     throw new Error(response.message || 'Failed to fetch settings');
   }
@@ -166,8 +170,8 @@ class WordPressApiService {
       form_id: formId,
     });
     
-    if (response.success && response.data.column_config) {
-      return response.data.column_config;
+    if (response.success && (response.data as any).column_config) {
+      return (response.data as any).column_config;
     }
     return [];
   }
@@ -183,6 +187,25 @@ class WordPressApiService {
     }
   }
 
+  // Table settings API methods
+  async getTableSettings(): Promise<Record<string, any>> {
+    const response = await this.post<TableSettingsResponse>('cf7dba_get_table_settings', {});
+    if (response.success && (response.data as any).table_settings) {
+      return (response.data as any).table_settings;
+    }
+    throw new Error(response.message || 'Failed to fetch table settings');
+  }
+
+  async saveTableSettings(tableSettings: Record<string, any>): Promise<void> {
+    const response = await this.post('cf7dba_save_table_settings', {
+      table_settings: JSON.stringify(tableSettings),
+    });
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to save table settings');
+    }
+  }
+
+
   // Export API methods
   async exportCSV(params: {
     form_id: string;
@@ -191,8 +214,8 @@ class WordPressApiService {
   }): Promise<string> {
     const response = await this.post<ExportResponse>('cf7dba_export_csv', params);
     
-    if (response.success && response.data.csv_data) {
-      return response.data.csv_data;
+    if (response.success && (response.data as any).csv_data) {
+      return (response.data as any).csv_data;
     }
     throw new Error(response.message || 'Failed to export CSV');
   }
@@ -216,7 +239,7 @@ class WordPressApiService {
         progress_percentage: number;
       };
     }>('cf7dba_check_migration', {});
-    return response.data;
+    return response.data as any;
   }
 
   async migrateData(params: {
@@ -238,12 +261,12 @@ class WordPressApiService {
       has_more: boolean;
       message?: string;
     }>('cf7dba_migrate_data', params);
-    return response.data;
+    return response.data as any;
   }
 
   async exportCFDB7Backup(): Promise<{ filepath: string; filename?: string }> {
     const response = await this.post<{ filepath: string; filename?: string }>('cf7dba_export_cfdb7_backup', {});
-    return response.data;
+    return response.data as any;
   }
 
   async cleanupCFDB7(): Promise<void> {
@@ -276,5 +299,6 @@ export type {
   FormFieldsResponse,
   SettingsResponse,
   ColumnConfigResponse,
+  TableSettingsResponse,
   ExportResponse,
 };

@@ -34,7 +34,11 @@ class Submission_Manager {
 	 * @param mixed $contact_form
 	 */
 	public function process_submission( $contact_form ) {
-		$submission = \WPCF7_Submission::get_instance();
+		$submission = null;
+		$cls = '\\WPCF7_Submission';
+		if ( class_exists( $cls ) ) {
+			$submission = $cls::get_instance();
+		}
 		
 		if ( ! $submission ) {
 			return;
@@ -49,13 +53,14 @@ class Submission_Manager {
 			return;
 		}
 
-		// Check if we've already processed this submission (prevent duplicates)
-		static $processed_submissions = array();
-		$submission_hash = md5( $form_id . serialize( $posted_data ) . time() );
-		if ( isset( $processed_submissions[ $submission_hash ] ) ) {
-			return;
+		// Compute stable idempotency key using CF7 posted data hash when available
+		$raw_posted = $posted_data;
+		$posted_hash = isset( $raw_posted['_wpcf7_posted_data_hash'] ) ? (string) $raw_posted['_wpcf7_posted_data_hash'] : '';
+		if ( empty( $posted_hash ) ) {
+			// Fallback to deterministic hash of sanitized form data
+			$posted_hash = hash( 'sha256', wp_json_encode( $this->filter_form_data( $posted_data ) ) );
 		}
-		$processed_submissions[ $submission_hash ] = true;
+		$idempotency_key = hash( 'sha256', (string) $form_id . '|' . $posted_hash );
 
 		// Filter out Contact Form 7 internal fields
 		$form_data = $this->filter_form_data( $posted_data );
@@ -65,9 +70,10 @@ class Submission_Manager {
 			'form_id' => $form_id,
 			'form_title' => $form_title,
 			'form_data' => $form_data,
+			'idempotency_key' => $idempotency_key,
 		);
 
-		// Save to database
+		// Save to database (DB ensures idempotency)
 		$submission_id = $this->database_operations->save_submission( $submission_data );
 
 		// Log if save failed
@@ -228,9 +234,39 @@ class Submission_Manager {
 	 * Get column configuration for a form
 	 *
 	 * @param string $form_id
+	 * @param array $form_fields Optional form fields to generate dynamic defaults
 	 * @return array
 	 */
-	public function get_column_config( $form_id ) {
-		return $this->database_operations->get_column_config( $form_id );
+	public function get_column_config( $form_id, $form_fields = array() ) {
+		return $this->database_operations->get_column_config( $form_id, $form_fields );
 	}
+
+	/**
+	 * Save table settings
+	 *
+	 * @param array $table_settings
+	 * @return bool
+	 */
+	public function save_table_settings( $table_settings ) {
+		return $this->database_operations->save_table_settings( $table_settings );
+	}
+
+	/**
+	 * Get table settings
+	 *
+	 * @return array
+	 */
+	public function get_table_settings() {
+		return $this->database_operations->get_table_settings();
+	}
+
+	/**
+	 * Get default table settings
+	 *
+	 * @return array
+	 */
+	public function get_default_table_settings_values() {
+		return $this->database_operations->get_default_table_settings();
+	}
+
 }
