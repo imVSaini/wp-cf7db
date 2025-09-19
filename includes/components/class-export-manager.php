@@ -59,12 +59,12 @@ class Export_Manager {
 			
 			// Add metadata fields first with proper default visibility
 			$metadata_fields = array(
-				'id' => array('title' => 'ID', 'visible' => true),
-				'form_id' => array('title' => 'Form ID', 'visible' => false), 
-				'form_title' => array('title' => 'Form Title', 'visible' => false),
-				'submit_ip' => array('title' => 'Submit IP', 'visible' => false),
-				'submit_datetime' => array('title' => 'Submit Time', 'visible' => true),
-				'submit_user_id' => array('title' => 'User ID', 'visible' => false)
+				'id' => array('title' => __( 'ID', 'leadsync' ), 'visible' => true),
+				'form_id' => array('title' => __( 'Form ID', 'leadsync' ), 'visible' => false), 
+				'form_title' => array('title' => __( 'Form Title', 'leadsync' ), 'visible' => false),
+				'submit_ip' => array('title' => __( 'Submit IP', 'leadsync' ), 'visible' => false),
+				'submit_datetime' => array('title' => __( 'Submit Time', 'leadsync' ), 'visible' => true),
+				'submit_user_id' => array('title' => __( 'User ID', 'leadsync' ), 'visible' => false)
 			);
 			
 			foreach ( $metadata_fields as $key => $config ) {

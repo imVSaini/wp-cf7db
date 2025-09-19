@@ -133,11 +133,11 @@ class Migration_Manager {
 					$migrated++;
 				} else {
 					$record_id = $row['form_id'] ?? $row['id'] ?? 'unknown';
-					$errors[] = "Failed to migrate record ID: {$record_id}";
+					$errors[] = sprintf( __( 'Failed to migrate record ID: %s', 'leadsync' ), $record_id );
 				}
-			} catch ( Exception $e ) {
+			} catch ( \Exception $e ) {
 				$record_id = $row['form_id'] ?? $row['id'] ?? 'unknown';
-				$errors[] = "Error migrating record ID: {$record_id} - " . $e->getMessage();
+				$errors[] = sprintf( __( 'Error migrating record ID: %s - %s', 'leadsync' ), $record_id, $e->getMessage() );
 			}
 		}
 
@@ -304,7 +304,7 @@ class Migration_Manager {
 			return $form->post_title;
 		}
 		
-		return "Form ID: {$form_id}";
+		return sprintf( __( 'Form ID: %s', 'leadsync' ), $form_id );
 	}
 
 	/**

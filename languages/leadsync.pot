@@ -68,6 +68,42 @@ msgstr ""
 msgid "No submissions found to export"
 msgstr ""
 
+#: includes/components/class-migration-manager.php:136
+msgid "Failed to migrate record ID: %s"
+msgstr ""
+
+#: includes/components/class-migration-manager.php:140
+msgid "Error migrating record ID: %s - %s"
+msgstr ""
+
+#: includes/components/class-migration-manager.php:307
+msgid "Form ID: %s"
+msgstr ""
+
+#: includes/components/class-export-manager.php:62
+msgid "ID"
+msgstr ""
+
+#: includes/components/class-export-manager.php:63
+msgid "Form ID"
+msgstr ""
+
+#: includes/components/class-export-manager.php:64
+msgid "Form Title"
+msgstr ""
+
+#: includes/components/class-export-manager.php:65
+msgid "Submit IP"
+msgstr ""
+
+#: includes/components/class-export-manager.php:66
+msgid "Submit Time"
+msgstr ""
+
+#: includes/components/class-export-manager.php:67
+msgid "User ID"
+msgstr ""
+
 #: includes/components/class-admin-interface.php:308
 msgid "Security check failed"
 msgstr ""
