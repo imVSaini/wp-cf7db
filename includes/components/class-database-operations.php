@@ -568,8 +568,8 @@ class Database_Operations {
 		// Add ID column first
 		$cols[] = array(
 			'key' => 'id',
-			'title' => 'ID',
-			'visible' => false,
+			'title' => __( 'ID', 'leadsync' ),
+			'visible' => true,
 			'order' => 0,
 			'width' => 100,
 			'isMetadata' => true
@@ -598,29 +598,30 @@ class Database_Operations {
 		}
 
 		// Add essential metadata columns
+		$order = count( $cols );
 		$cols[] = array(
 			'key' => 'submit_ip',
-			'title' => 'IP',
+			'title' => __( 'Submit IP', 'leadsync' ),
 			'visible' => false,
-			'order' => count( $cols ),
+			'order' => $order++,
 			'width' => 120,
 			'isMetadata' => true
 		);
 		
 		$cols[] = array(
 			'key' => 'submit_datetime',
-			'title' => 'Date',
+			'title' => __( 'Submit Time', 'leadsync' ),
 			'visible' => true,
-			'order' => count( $cols ) + 1,
+			'order' => $order++,
 			'width' => 150,
 			'isMetadata' => true
 		);
 		
 		$cols[] = array(
 			'key' => 'submit_user_id',
-			'title' => 'User ID',
+			'title' => __( 'User ID', 'leadsync' ),
 			'visible' => false,
-			'order' => count( $cols ) + 2,
+			'order' => $order++,
 			'width' => 100,
 			'isMetadata' => true
 		);

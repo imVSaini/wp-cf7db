@@ -310,9 +310,9 @@ const ContactForm7Database: React.FC = () => {
         // Generate filename with form name and date range
         const selectedFormData = formOptions.find(f => f.value === selectedForm);
         const formNameForFile = selectedFormData?.label || `form_${selectedForm}`;
-        const dateStr = dateRange?.[0] ? `_${dateRange[0].format('YYYY-MM-DD')}` : '';
-        const endDateStr = dateRange?.[1] ? `_to_${dateRange[1].format('YYYY-MM-DD')}` : '';
-        const filename = `cf7_${formNameForFile.replace(/[^a-zA-Z0-9]/g, '_')}${dateStr}${endDateStr}.csv`;
+        const dateStr = dateRange?.[0] ? `-${dateRange[0].format('YYYY-MM-DD')}` : '';
+        const endDateStr = dateRange?.[1] ? `-to-${dateRange[1].format('YYYY-MM-DD')}` : '';
+        const filename = `leadsync-${formNameForFile.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')}${dateStr}${endDateStr}.csv`;
         
         // Create and download CSV file
         const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -438,7 +438,7 @@ const ContactForm7Database: React.FC = () => {
           
           {/* Search Input */}
           <Input
-            placeholder="Search submissions..."
+            placeholder="Type Something..."
             prefix={isSearching ? <LoadingOutlined style={{ color: '#1890ff' }} /> : <SearchOutlined style={{ color: '#8c8c8c' }} />}
             suffix={searchQuery ? (
               <Button

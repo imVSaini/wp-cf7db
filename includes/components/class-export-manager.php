@@ -38,30 +38,38 @@ class Export_Manager {
 			return '';
 		}
 
+		// Extract form fields from submissions to pass to get_column_config
+		$form_fields = array();
+		$all_fields = array();
+		foreach ( $submissions as $submission ) {
+			if ( isset( $submission['form_data'] ) && is_array( $submission['form_data'] ) ) {
+				$all_fields = array_merge( $all_fields, array_keys( $submission['form_data'] ) );
+			}
+		}
+		$all_fields = array_unique( $all_fields );
+		
+		// Convert form fields to the format expected by get_column_config
+		foreach ( $all_fields as $field ) {
+			$form_fields[] = array(
+				'name' => $field,
+				'label' => ucwords( str_replace( array( '_', '-' ), ' ', $field ) )
+			);
+		}
+
 		// Get column configuration from database if form_id is provided
 		$column_config = array();
 		if ( ! empty( $form_id ) ) {
-			$column_config = $this->database_operations->get_column_config( $form_id );
+			$column_config = $this->database_operations->get_column_config( $form_id, $form_fields );
 		}
 
-		// If no column config found, fallback to extracting from submissions
+		// If no column config found, create fallback config from submissions
 		if ( empty( $column_config ) ) {
-			$all_fields = array();
-			foreach ( $submissions as $submission ) {
-				if ( isset( $submission['form_data'] ) && is_array( $submission['form_data'] ) ) {
-					$all_fields = array_merge( $all_fields, array_keys( $submission['form_data'] ) );
-				}
-			}
-			$all_fields = array_unique( $all_fields );
-			
 			// Create basic column config from extracted fields
 			$column_config = array();
 			
 			// Add metadata fields first with proper default visibility
 			$metadata_fields = array(
 				'id' => array('title' => __( 'ID', 'leadsync' ), 'visible' => true),
-				'form_id' => array('title' => __( 'Form ID', 'leadsync' ), 'visible' => false), 
-				'form_title' => array('title' => __( 'Form Title', 'leadsync' ), 'visible' => false),
 				'submit_ip' => array('title' => __( 'Submit IP', 'leadsync' ), 'visible' => false),
 				'submit_datetime' => array('title' => __( 'Submit Time', 'leadsync' ), 'visible' => true),
 				'submit_user_id' => array('title' => __( 'User ID', 'leadsync' ), 'visible' => false)
@@ -121,10 +129,6 @@ class Export_Manager {
 				// Handle metadata fields
 				if ( $field_key === 'id' ) {
 					$value = $submission['id'] ?? '';
-				} elseif ( $field_key === 'form_id' ) {
-					$value = $submission['form_id'] ?? '';
-				} elseif ( $field_key === 'form_title' ) {
-					$value = $submission['form_title'] ?? '';
 				} elseif ( $field_key === 'submit_ip' ) {
 					$value = $submission['submit_ip'] ?? '';
 				} elseif ( $field_key === 'submit_datetime' ) {
