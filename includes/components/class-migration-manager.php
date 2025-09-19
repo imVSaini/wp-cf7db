@@ -314,8 +314,16 @@ class Migration_Manager {
 	 * @return string
 	 */
 	private function extract_form_id_from_name( $form_name ) {
-		// Try to find Contact Form 7 form by title
-		$form = get_page_by_title( $form_name, OBJECT, 'wpcf7_contact_form' );
+		// Try to find Contact Form 7 form by title using WP_Query
+		$args = array(
+			'post_type'      => 'wpcf7_contact_form',
+			'title'          => $form_name,
+			'posts_per_page' => 1,
+		);
+		$query = new \WP_Query( $args );
+		$form = $query->have_posts() ? $query->posts[0] : null;
+		wp_reset_postdata();
+		
 		if ( $form ) {
 			return (string) $form->ID;
 		}
